@@ -1,11 +1,15 @@
 {
   "name": "project",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "main": "electron/dist/main.js",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
+    "dev:vite": "vite",
+    "dev:electron": "tsc -p electron && wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .",
+    "build": "vite build && tsc -p electron",
+    "build:app": "npm run build && electron-builder",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -19,6 +23,10 @@
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.3",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.0.0",
+    "electron": "^38.2.0",
+    "electron-builder": "^26.0.12",
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
@@ -29,6 +37,25 @@
     "tailwindcss": "^3.4.17",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.44.0",
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "wait-on": "^9.0.1"
+  },
+  "build": {
+    "appId": "com.project.demo",
+    "productName": "ProjectApp",
+    "files": [
+      "dist/**/*",
+      "electron/dist/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "electron/icon.ico"
+    }
   }
 }
