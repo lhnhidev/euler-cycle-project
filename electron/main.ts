@@ -1,4 +1,11 @@
-import { app, BrowserWindow, globalShortcut, Menu, screen } from "electron";
+import {
+  app,
+  BrowserWindow,
+  globalShortcut,
+  ipcMain,
+  Menu,
+  screen,
+} from "electron";
 import * as path from "path";
 
 let mainWindow: BrowserWindow | null = null;
@@ -9,8 +16,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width,
     height,
-    // frame: false,
-    // titleBarStyle: "hidden",
+    frame: false,
+    titleBarStyle: "hidden",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
     },
@@ -47,6 +54,25 @@ app.whenReady().then(() => {
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
+
 app.on("activate", () => {
   if (mainWindow === null) createWindow();
+});
+
+ipcMain.on("window-control", (_event, action: string) => {
+  if (!mainWindow) return;
+  switch (action) {
+    case "minimize":
+      mainWindow.minimize();
+      break;
+    case "maximize":
+      mainWindow.maximize();
+      break;
+    case "unmaximize":
+      mainWindow.unmaximize();
+      break;
+    case "close":
+      mainWindow.close();
+      break;
+  }
 });

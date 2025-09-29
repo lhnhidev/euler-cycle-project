@@ -1,3 +1,84 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --primary-color: #1f5ca9;
+  --secondary-color: #00afef;
+  --bg-color: #f6f6f6;
+  --text-color: #18223e;
+  --border-color: #dddddd;
+
+  --height-title-bar-windows: 40px;
+  --height-direction-tree-content: 400px;
+  --transition-time: 0.1s;
+  --width-of-window-tool: 330px;
+  --width-of-entering-graph: 330px;
+  --font-size-sm: 14px;
+  --font-size-lg: 16px;
+}
+
+@font-face {
+  font-family: "Netflix Sans";
+  src:
+    local("NetflixSans-Regular"),
+    url("/fonts/NetflixSans-Regular.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Netflix Sans";
+  font-weight: bold;
+  src:
+    local("NetflixSans-Bold"),
+    url("/fonts/NetflixSans-Bold.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Netflix Sans";
+  font-weight: 600;
+  src:
+    local("NetflixSans-Medium"),
+    url("/fonts/NetflixSans-Medium.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Netflix Sans";
+  font-weight: 300;
+  src:
+    local("NetflixSans-Light"),
+    url("/fonts/NetflixSans-Light.woff2") format("woff2");
+}
+
+body {
+  font-family: "Netflix Sans";
+  /* font-size: var(--font-size); */
+  color: var(--text-color);
+}
+
+.hover-primary:hover {
+  color: var(--primary-color);
+  transition: var(--transition-time);
+}
+
+.hover-bg-primary:hover {
+  background-color: var(--primary-color);
+  transition: var(--transition-time);
+}
+
+.hover-bg-gray:hover {
+  background-color: rgb(229 231 235 / var(--tw-bg-opacity, 1));
+  transition: var(--transition-time);
+}
+
+.ant-tooltip .ant-tooltip-inner {
+  background-color: var(--text-color) !important;
+  color: #fff !important;
+}
+
+.set-text-font-size-smaller {
+  font-size: var(--font-size-sm);
+}
+
+.set-text-font-size-larger {
+  font-size: var(--font-size-lg);
+}
