@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "antd": "^5.27.4",
+    "cytoscape": "^3.33.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0"
