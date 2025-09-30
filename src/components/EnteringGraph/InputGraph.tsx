@@ -4,8 +4,8 @@ import { MdOutlineUploadFile } from "react-icons/md";
 
 const InputGraph = () => {
   return (
-    <div>
-      <div className="h-[235px] w-full rounded-sm bg-white p-3">InputGraph</div>
+    <div className="flex h-full max-h-[420px] flex-col">
+      <div className="w-full flex-1 rounded-sm bg-white p-3">InputGraph</div>
       <div className="mt-3 flex items-center justify-end gap-2">
         {/* <label htmlFor="input-graph">Nhập bằng file .txt</label> */}
         <ConfigProvider

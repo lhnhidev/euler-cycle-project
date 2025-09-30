@@ -1,11 +1,16 @@
-import { ConfigProvider, Segmented } from "antd";
+import { ConfigProvider, Segmented, Tooltip } from "antd";
 import TitleComponent from "../TitleComponent";
 import InputGraph from "./InputGraph";
+import { FaAnglesUp } from "react-icons/fa6";
+import { useAppContext } from "@/context/AppContext";
 
 const EnteringGraph = () => {
+  const { minimizeDescriptionComponent, setMinimizeDescriptionComponent } =
+    useAppContext();
+
   return (
     <div className="h-full border-l border-[var(--border-color)] bg-[var(--bg-color)] px-2 py-4">
-      <div className="">
+      <div className="flex h-full flex-col">
         <TitleComponent
           title="Nhập liệu đồ thị"
           style={{ marginTop: "-16px" }}
@@ -33,8 +38,23 @@ const EnteringGraph = () => {
           </ConfigProvider>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-4 flex-1">
           <InputGraph />
+        </div>
+
+        <div
+          className={`flex w-full justify-end pb-3 pr-4 ${minimizeDescriptionComponent ? "" : "hidden"}`}
+        >
+          <Tooltip title="Hiển thị mô tả" placement="topLeft">
+            <div
+              className="rounded-full border border-gray-300 bg-[var(--primary-color)] p-3 text-white shadow-md hover:cursor-pointer hover:opacity-80"
+              onClick={() =>
+                setMinimizeDescriptionComponent(!minimizeDescriptionComponent)
+              }
+            >
+              <FaAnglesUp />
+            </div>
+          </Tooltip>
         </div>
       </div>
     </div>

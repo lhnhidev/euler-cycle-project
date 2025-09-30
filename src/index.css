@@ -82,3 +82,7 @@ body {
 .set-text-font-size-larger {
   font-size: var(--font-size-lg);
 }
+
+.ant-table-thead > tr > th {
+  color: var(--primary-color) !important;
+}
