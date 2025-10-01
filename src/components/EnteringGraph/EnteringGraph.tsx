@@ -3,10 +3,13 @@ import TitleComponent from "../TitleComponent";
 import InputGraph from "./InputGraph";
 import { FaAnglesUp } from "react-icons/fa6";
 import { useAppContext } from "@/context/AppContext";
+import { useGraphContext } from "@/context/GraphContext";
 
 const EnteringGraph = () => {
   const { minimizeDescriptionComponent, setMinimizeDescriptionComponent } =
     useAppContext();
+
+  const { isDirected, setIsDirected } = useGraphContext();
 
   return (
     <div className="h-full border-l border-[var(--border-color)] bg-[var(--bg-color)] px-2 py-4">
@@ -32,6 +35,12 @@ const EnteringGraph = () => {
           >
             <Segmented
               options={["Vô hướng", "Có hướng"]}
+              value={isDirected ? "Có hướng" : "Vô hướng"}
+              onChange={(value) => {
+                console.log(value);
+                setIsDirected(value === "Có hướng" ? true : false);
+              }}
+              size="large"
               block
               className="flex h-10 items-center"
             />

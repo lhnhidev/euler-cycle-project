@@ -2,15 +2,15 @@ import { AppContext } from "./AppContext";
 import { useState, type ReactNode } from "react";
 
 const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [test, setTest] = useState<string>("Hello from context!");
+  const [ping, setPing] = useState<string>("Hello from app context!");
   const [minimizeDescriptionComponent, setMinimizeDescriptionComponent] =
     useState<boolean>(false);
 
   return (
     <AppContext.Provider
       value={{
-        test,
-        setTest,
+        ping,
+        setPing,
         minimizeDescriptionComponent,
         setMinimizeDescriptionComponent,
       }}
