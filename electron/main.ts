@@ -46,7 +46,7 @@ app.whenReady().then(() => {
     }
   });
 
-  globalShortcut.register("CommandOrControl+R", () => {
+  globalShortcut.register("CommandOrControl+Shift+R", () => {
     mainWindow?.reload();
   });
 });

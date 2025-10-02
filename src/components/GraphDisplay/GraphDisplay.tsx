@@ -94,9 +94,10 @@ const GraphDisplay = () => {
       cleanup = graphRef.current.display(cyRef.current);
 
       graphRef.current.addNodeByClick(cyRef.current);
-      graphRef.current.addEdgeByClick(isDirected);
+      graphRef.current.addEdgeByClick();
       graphRef.current.deleteSelectedNode();
       graphRef.current.deleteSelectedEdge();
+      graphRef.current.changeLabelNodeByClick(cyRef.current);
     }
 
     return cleanup;
