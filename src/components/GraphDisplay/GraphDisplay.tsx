@@ -1,14 +1,14 @@
 import { useGraphContext } from "@/context/GraphContext";
-import Graph from "@/libs/Graph";
 import { useEffect, useRef } from "react";
 
 const GraphDisplay = () => {
   const cyRef = useRef<HTMLDivElement>(null);
-  const graphRef = useRef(new Graph());
+  const { graph } = useGraphContext();
   const { isDirected } = useGraphContext();
 
   useEffect(() => {
-    graphRef.current.setIsDirected(isDirected);
+    graph.current.setIsDirected(isDirected);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDirected]);
 
   useEffect(() => {
@@ -16,91 +16,92 @@ const GraphDisplay = () => {
 
     if (cyRef.current) {
       // Thêm nút và cạnh mẫu
-      graphRef.current.addNode("A", "A");
-      graphRef.current.addNode("B", "B");
-      graphRef.current.addNode("C", "C");
-      graphRef.current.addNode("D", "D");
-      graphRef.current.addNode("E", "E");
-      graphRef.current.addNode("F", "F");
-      graphRef.current.addNode("G", "G");
-      graphRef.current.addNode("H", "H");
-      graphRef.current.addNode("I", "I");
-      graphRef.current.addNode("J", "J");
-      graphRef.current.addNode("K", "K");
-      graphRef.current.addNode("L", "L");
-      graphRef.current.addNode("M", "M");
-      graphRef.current.addNode("N", "N");
-      graphRef.current.addNode("O", "O");
-      graphRef.current.addNode("P", "P");
-      graphRef.current.addNode("Q", "Q");
-      graphRef.current.addNode("R", "R");
-      graphRef.current.addNode("S", "S");
-      graphRef.current.addNode("T", "T");
-      graphRef.current.addNode("U", "U");
-      graphRef.current.addNode("V", "V");
+      // graph.current.addNode("A", "A");
+      // graph.current.addNode("B", "B");
+      // graph.current.addNode("C", "C");
+      // graph.current.addNode("D", "D");
+      // graph.current.addNode("E", "E");
+      // graph.current.addNode("F", "F");
+      // graph.current.addNode("G", "G");
+      // graph.current.addNode("H", "H");
+      // graph.current.addNode("I", "I");
+      // graph.current.addNode("J", "J");
+      // graph.current.addNode("K", "K");
+      // graph.current.addNode("L", "L");
+      // graph.current.addNode("M", "M");
+      // graph.current.addNode("N", "N");
+      // graph.current.addNode("O", "O");
+      // graph.current.addNode("P", "P");
+      // graph.current.addNode("Q", "Q");
+      // graph.current.addNode("R", "R");
+      // graph.current.addNode("S", "S");
+      // graph.current.addNode("T", "T");
+      // graph.current.addNode("U", "U");
+      // graph.current.addNode("V", "V");
+
+      // graph.current.addEdge("A", "V");
+      // graph.current.addEdge("B", "U");
+      // graph.current.addEdge("C", "T");
+      // graph.current.addEdge("D", "S");
+      // graph.current.addEdge("E", "R");
+      // graph.current.addEdge("F", "Q");
+      // graph.current.addEdge("G", "P");
+      // graph.current.addEdge("H", "O");
+      // graph.current.addEdge("I", "N");
+      // graph.current.addEdge("J", "M");
+      // graph.current.addEdge("K", "L");
+      // graph.current.addEdge("A", "B");
 
       // Mỗi đỉnh chỉ nối tối đa với 2 đỉnh khác
-      const nodes = [
-        "A",
-        "B",
-        "C",
-        "D",
-        "E",
-        "F",
-        "G",
-        "H",
-        "I",
-        "J",
-        "K",
-        "L",
-        "M",
-        "N",
-        "O",
-        "P",
-        "Q",
-        "R",
-        "S",
-        "T",
-        "U",
-        "V",
-      ];
-      // Đánh dấu số lần nối của mỗi đỉnh
-      const edgeCount: Record<string, number> = {};
-      nodes.forEach((node) => (edgeCount[node] = 0));
+      // const nodes = [
+      //   "A",
+      //   "B",
+      //   "C",
+      //   "D",
+      //   "E",
+      //   "F",
+      //   "G",
+      //   "H",
+      //   "I",
+      //   "J",
+      //   "K",
+      //   "L",
+      //   "M",
+      //   "N",
+      //   "O",
+      //   "P",
+      //   "Q",
+      //   "R",
+      //   "S",
+      //   "T",
+      //   "U",
+      //   "V",
+      // ];
+      // // Đánh dấu số lần nối của mỗi đỉnh
+      // const edgeCount: Record<string, number> = {};
+      // nodes.forEach((node) => (edgeCount[node] = 0));
 
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          if (edgeCount[nodes[i]] < 2 && edgeCount[nodes[j]] < 2) {
-            graphRef.current.addEdge(nodes[i], nodes[j]);
-            edgeCount[nodes[i]]++;
-            edgeCount[nodes[j]]++;
-          }
-        }
-      }
+      // for (let i = 0; i < nodes.length; i++) {
+      //   for (let j = i + 1; j < nodes.length; j++) {
+      //     if (edgeCount[nodes[i]] < 2 && edgeCount[nodes[j]] < 2) {
+      //       graph.current.addEdge(nodes[i], nodes[j]);
+      //       edgeCount[nodes[i]]++;
+      //       edgeCount[nodes[j]]++;
+      //     }
+      //   }
+      // }
 
-      graphRef.current.addEdge("A", "V");
-      graphRef.current.addEdge("B", "U");
-      graphRef.current.addEdge("C", "T");
-      graphRef.current.addEdge("D", "S");
-      graphRef.current.addEdge("E", "R");
-      graphRef.current.addEdge("F", "Q");
-      graphRef.current.addEdge("G", "P");
-      graphRef.current.addEdge("H", "O");
-      graphRef.current.addEdge("I", "N");
-      graphRef.current.addEdge("J", "M");
-      graphRef.current.addEdge("K", "L");
-      graphRef.current.addEdge("A", "B");
+      cleanup = graph.current.display(cyRef.current);
 
-      cleanup = graphRef.current.display(cyRef.current);
-
-      graphRef.current.addNodeByClick(cyRef.current);
-      graphRef.current.addEdgeByClick();
-      graphRef.current.deleteSelectedNode();
-      graphRef.current.deleteSelectedEdge();
-      graphRef.current.changeLabelNodeByClick(cyRef.current);
+      graph.current.addNodeByClick(cyRef.current);
+      graph.current.addEdgeByClick();
+      graph.current.deleteSelectedNode();
+      graph.current.deleteSelectedEdge();
+      graph.current.changeLabelNodeByClick(cyRef.current);
     }
 
     return cleanup;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

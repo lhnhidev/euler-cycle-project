@@ -5,6 +5,8 @@ import dblclick from "cytoscape-dblclick";
 
 cytoscape.use(dblclick);
 
+type Listener = () => void;
+
 export default class Graph {
   private cy: cytoscape.Core | null = null;
   private numberOfNodes: number = 0;
@@ -13,10 +15,27 @@ export default class Graph {
   private edges: { source: string; target: string }[];
   private _keydownHandler?: (e: KeyboardEvent) => void;
   private isChangeingLabelMode: boolean = false;
+  private listeners: Listener[] = [];
 
   constructor() {
     this.nodes = [];
     this.edges = [];
+  }
+
+  getCore() {
+    return this.cy;
+  }
+
+  subscribe(listener: Listener) {
+    this.listeners.push(listener);
+  }
+
+  unsubscribe(listener: Listener) {
+    this.listeners = this.listeners.filter((l) => l !== listener);
+  }
+
+  private notify() {
+    this.listeners.forEach((l) => l());
   }
 
   addNode(id: string, label: string, isShameLabel: boolean = true): boolean {
@@ -33,6 +52,7 @@ export default class Graph {
     }
 
     this.setNumberOfNodes(this.numberOfNodes + 1);
+    this.notify();
     this.nodes.push({ id, label });
     return true;
   }
@@ -50,6 +70,7 @@ export default class Graph {
     );
 
     this.nodes.splice(nodeIndex, 1);
+    this.notify();
     this.setNumberOfNodes(this.numberOfNodes - 1);
     return true;
   }
@@ -68,6 +89,7 @@ export default class Graph {
     //
 
     this.edges.push({ source: sourceId, target: targetId });
+    this.notify();
     return true;
   }
 
@@ -82,6 +104,7 @@ export default class Graph {
     }
 
     this.edges.splice(edgeIndex, 1);
+    this.notify();
     return true;
   }
 
@@ -97,12 +120,17 @@ export default class Graph {
     return this.numberOfNodes;
   }
 
+  getNumberOfEdges() {
+    return this.edges.length;
+  }
+
   setNumberOfNodes(count: number): boolean {
     if (count < 0) {
       console.log("Số lượng nút không thể âm");
       return false;
     }
     this.numberOfNodes = count;
+    // this.notify();
     return true;
   }
 
@@ -121,11 +149,13 @@ export default class Graph {
   }
 
   clear() {
+    this.setNumberOfNodes(0);
     this.nodes = [];
     this.edges = [];
+    // this.notify();
   }
 
-  display(container: HTMLDivElement): () => void {
+  display(container: HTMLDivElement, isRandom = false): () => void {
     if (this.cy) {
       this.cy!.dblclick(200);
     }
@@ -151,7 +181,7 @@ export default class Graph {
       };
     });
 
-    if (!this.cy) {
+    if (!this.cy || isRandom) {
       this.cy = cytoscape({
         container,
         elements: [...nodeElements, ...edgeElements],
@@ -159,12 +189,15 @@ export default class Graph {
         layout: LayoutGraph(this.getNumberOfNodes()),
       });
     } else {
-      this.cy.edges().forEach((edge) => {
-        edge.style(
-          "target-arrow-shape",
-          this.getIsDirected() ? "triangle" : "none",
-        );
-      });
+      console.log("Cytoscape đã được khởi tạo, cập nhật lại đồ thị.");
+      if (this.cy) {
+        this.cy.edges().forEach((edge) => {
+          edge.style(
+            "target-arrow-shape",
+            this.getIsDirected() ? "triangle" : "none",
+          );
+        });
+      }
     }
 
     return () => {
@@ -359,6 +392,7 @@ export default class Graph {
 
             console.log(this.getNodes());
 
+            this.notify();
             screen.removeChild(input);
             this.cy!.off("zoom", zoomHandler);
             isChangeLabelMode = false;
@@ -532,5 +566,59 @@ export default class Graph {
         ghostNode.position(event.position);
       }
     });
+  }
+
+  randomGraph(container: HTMLDivElement) {
+    this.clear();
+    const randomNumber = Math.round(Math.random());
+    const amountOfNodes = Math.floor(Math.random() * 6) + 5; // từ 5 đến 10
+    let nodeLabels: string[] = [];
+
+    if (randomNumber === 0) {
+      // Node là số
+      nodeLabels = Array.from({ length: amountOfNodes }, (_, i) =>
+        (i + 1).toString(),
+      );
+    } else {
+      // Node là chữ
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      nodeLabels = Array.from(
+        { length: amountOfNodes },
+        (_, i) => alphabet[i % alphabet.length],
+      );
+    }
+
+    // Thêm node
+    nodeLabels.forEach((label, idx) => {
+      this.addNode(idx.toString(), label);
+    });
+
+    // Random cạnh
+    const maxEdges =
+      (amountOfNodes * (amountOfNodes - (this.isDirected ? 1 : 2))) /
+      (this.isDirected ? 1 : 2);
+    const amountOfEdges =
+      Math.floor(Math.random() * (maxEdges - amountOfNodes + 1)) +
+      amountOfNodes;
+
+    const edgeSet = new Set<string>();
+    while (edgeSet.size < amountOfEdges) {
+      const sourceIdx = Math.floor(Math.random() * amountOfNodes);
+      const targetIdx = Math.floor(Math.random() * amountOfNodes);
+      // Không nối vào chính nó
+      if (sourceIdx === targetIdx) continue;
+      const edgeKey = this.isDirected
+        ? `${sourceIdx}-${targetIdx}`
+        : [sourceIdx, targetIdx].sort().join("-");
+      if (edgeSet.has(edgeKey)) continue;
+      edgeSet.add(edgeKey);
+      this.addEdge(sourceIdx.toString(), targetIdx.toString());
+    }
+    this.display(container, true);
+    this.addNodeByClick(container);
+    this.addEdgeByClick();
+    this.changeLabelNodeByClick(container);
+    this.deleteSelectedNode();
+    this.deleteSelectedEdge();
   }
 }

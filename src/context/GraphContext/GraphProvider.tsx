@@ -1,9 +1,11 @@
+import Graph from "@/libs/Graph";
 import { GraphContext } from "./GraphContext";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
 const GraphProvider = ({ children }: { children: ReactNode }) => {
   const [ping, setPing] = useState<string>("Hello from graph context!");
   const [isDirected, setIsDirected] = useState<boolean>(false);
+  const graph = useRef(new Graph());
 
   return (
     <GraphContext.Provider
@@ -12,6 +14,7 @@ const GraphProvider = ({ children }: { children: ReactNode }) => {
         setPing,
         isDirected,
         setIsDirected,
+        graph,
       }}
     >
       {children}
