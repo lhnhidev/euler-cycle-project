@@ -47,9 +47,7 @@ const EnteringGraph = () => {
           </ConfigProvider>
         </div>
 
-        <div className="mt-4 flex-1">
-          <InputGraph />
-        </div>
+        <InputGraph />
 
         <div
           className={`flex w-full justify-end pb-3 pr-4 ${minimizeDescriptionComponent ? "" : "hidden"}`}
