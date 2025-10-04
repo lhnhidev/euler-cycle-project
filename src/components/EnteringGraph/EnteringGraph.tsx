@@ -37,7 +37,7 @@ const EnteringGraph = () => {
               options={["Vô hướng", "Có hướng"]}
               value={isDirected ? "Có hướng" : "Vô hướng"}
               onChange={(value) => {
-                console.log(value);
+                // console.log(value);
                 setIsDirected(value === "Có hướng" ? true : false);
               }}
               size="large"
@@ -50,7 +50,7 @@ const EnteringGraph = () => {
         <InputGraph />
 
         <div
-          className={`flex w-full justify-end pb-3 pr-4 ${minimizeDescriptionComponent ? "" : "hidden"}`}
+          className={`flex w-full justify-end pb-3 pr-4 transition-all ${minimizeDescriptionComponent ? "" : "hidden"}`}
         >
           <Tooltip title="Hiển thị mô tả" placement="topLeft">
             <div

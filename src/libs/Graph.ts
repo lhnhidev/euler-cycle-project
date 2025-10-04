@@ -26,6 +26,11 @@ export default class Graph {
     return this.cy;
   }
 
+  getNodeIdByLabel(label: string) {
+    // Tùy vào cách bạn lưu node, ví dụ:
+    return this.nodes.find((node) => node.label === label)?.id;
+  }
+
   subscribe(listener: Listener) {
     this.listeners.push(listener);
   }
@@ -305,7 +310,8 @@ export default class Graph {
         if (finished) return;
         finished = true;
 
-        const value = input.value.trim()[0]?.toUpperCase() || "";
+        // const value = input.value.trim()[0]?.toUpperCase() || "";
+        const value = input.value.trim()?.toUpperCase() || "";
         if (value) {
           const node = this.cy!.getElementById(nodeId);
           node.data("label", value);
@@ -381,7 +387,8 @@ export default class Graph {
           input.focus();
 
           const finish = () => {
-            const value = input.value.trim()[0]?.toUpperCase() || "";
+            // const value = input.value.trim()[0]?.toUpperCase() || "";
+            const value = input.value.trim()?.toUpperCase() || "";
             if (value) {
               node.data("label", value);
             } else {
