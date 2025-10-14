@@ -2,6 +2,8 @@ import cytoscape from "cytoscape";
 import CSSGraph from "./CSSGraph";
 import LayoutGraph from "./LayoutGraph";
 import dblclick from "cytoscape-dblclick";
+import MySet from "./data-structures/MySet";
+import MyStack from "./data-structures/MyStack";
 
 cytoscape.use(dblclick);
 
@@ -16,10 +18,44 @@ export default class Graph {
   private _keydownHandler?: (e: KeyboardEvent) => void;
   private isChangeingLabelMode: boolean = false;
   private listeners: Listener[] = [];
+  private adj: { [key: string]: MySet<string> } = {};
+
+  public onChange?: () => void;
+
+  setOnChange(callback: () => void) {
+    this.onChange = callback;
+  }
 
   constructor() {
     this.nodes = [];
     this.edges = [];
+  }
+
+  getAdjacencyList() {
+    return this.adj;
+  }
+
+  buildAdjacencyList() {
+    const listEdges = this.getEdges();
+
+    for (let i = 0; i < listEdges.length; i++) {
+      const sourceId = listEdges[i].source;
+      const targetId = listEdges[i].target;
+
+      if (this.isDirected) {
+        this.adj[sourceId] = this.adj[sourceId] || new MySet<number>();
+        this.adj[sourceId].add(targetId);
+      } else {
+        this.adj[sourceId] = this.adj[sourceId] || new MySet<number>();
+        this.adj[targetId] = this.adj[targetId] || new MySet<number>();
+        this.adj[sourceId].add(targetId);
+        this.adj[targetId].add(sourceId);
+      }
+    }
+  }
+
+  clearAdjacencyList() {
+    this.adj = {};
   }
 
   getCore() {
@@ -27,7 +63,6 @@ export default class Graph {
   }
 
   getNodeIdByLabel(label: string) {
-    // Tùy vào cách bạn lưu node, ví dụ:
     return this.nodes.find((node) => node.label === label)?.id;
   }
 
@@ -59,6 +94,7 @@ export default class Graph {
     this.setNumberOfNodes(this.numberOfNodes + 1);
     this.notify();
     this.nodes.push({ id, label });
+    this.onChange?.();
     return true;
   }
 
@@ -77,6 +113,24 @@ export default class Graph {
     this.nodes.splice(nodeIndex, 1);
     this.notify();
     this.setNumberOfNodes(this.numberOfNodes - 1);
+    this.onChange?.();
+    return true;
+  }
+
+  changeLabelNode(id: string, newLabel: string): boolean {
+    const node = this.nodes.find((node) => node.id === id);
+    if (!node) {
+      console.log(`Nút có id là ${id} không tồn tại.`);
+      return false;
+    }
+
+    // if (this.nodes.find((node) => node.label === newLabel)) {
+    //   console.log(`Nút với label là ${newLabel} đã tồn tại.`);
+    //   return false;
+    // }
+
+    node.label = newLabel;
+    this.notify();
     return true;
   }
 
@@ -95,6 +149,7 @@ export default class Graph {
 
     this.edges.push({ source: sourceId, target: targetId });
     this.notify();
+    this.onChange?.();
     return true;
   }
 
@@ -110,6 +165,7 @@ export default class Graph {
 
     this.edges.splice(edgeIndex, 1);
     this.notify();
+    this.onChange?.();
     return true;
   }
 
@@ -243,6 +299,14 @@ export default class Graph {
           selectedEdges.remove();
           const selectedIds = selectedEdges.map((n) => {
             const edge = n as cytoscape.EdgeSingular;
+
+            // const sourceId = edge.source().id();
+            // const targetId = edge.target().id();
+
+            // this.cy!.remove(
+            //   `edge[source = "${sourceId}"][target = "${targetId}"]`,
+            // );
+
             return {
               sourceId: edge.source().id(),
               targetId: edge.target().id(),
@@ -252,7 +316,7 @@ export default class Graph {
             this.removeEdge(id.sourceId, id.targetId),
           );
           // console.log(this.nodes);
-          console.log(this.edges);
+          console.log(this.getEdges());
           console.log(
             "Đã xóa edge:",
             selectedEdges.map((e) => e.id()),
@@ -386,21 +450,30 @@ export default class Graph {
           screen.appendChild(input);
           input.focus();
 
+          let finished = false;
+
           const finish = () => {
+            if (finished) return;
+            finished = true;
             // const value = input.value.trim()[0]?.toUpperCase() || "";
             const value = input.value.trim()?.toUpperCase() || "";
             if (value) {
               node.data("label", value);
+              this.changeLabelNode(node.id(), value);
             } else {
               node.remove();
             }
 
             this.isChangeingLabelMode = false;
 
-            console.log(this.getNodes());
+            // console.log(this.getNodes());
 
             this.notify();
-            screen.removeChild(input);
+            if (screen && input && input.parentNode === screen) {
+              if (screen.contains(input)) {
+                screen.removeChild(input);
+              }
+            }
             this.cy!.off("zoom", zoomHandler);
             isChangeLabelMode = false;
           };
@@ -627,5 +700,239 @@ export default class Graph {
     this.changeLabelNodeByClick(container);
     this.deleteSelectedNode();
     this.deleteSelectedEdge();
+    this.onChange?.();
+  }
+
+  private marked: { [key: string]: boolean } = {};
+  private degree: { [key: string]: number } = {};
+  private degIn: { [key: string]: number } = {};
+  private degOut: { [key: string]: number } = {};
+
+  getDegIn() {
+    return this.degIn;
+  }
+
+  getDegOut() {
+    return this.degOut;
+  }
+
+  getDegree() {
+    return this.degree;
+  }
+
+  private buildDegree() {
+    this.getNodes().forEach((node) => {
+      this.degree[node.id] = 0;
+      this.degIn[node.id] = 0;
+      this.degOut[node.id] = 0;
+    });
+
+    if (this.isDirected) {
+      this.getEdges().forEach((edge) => {
+        this.degOut[edge.source] = (this.degOut[edge.source] || 0) + 1;
+        this.degIn[edge.target] = (this.degIn[edge.target] || 0) + 1;
+      });
+    } else {
+      this.getEdges().forEach((edge) => {
+        this.degree[edge.source] = (this.degree[edge.source] || 0) + 1;
+        this.degree[edge.target] = (this.degree[edge.target] || 0) + 1;
+      });
+    }
+  }
+
+  private clearDegree() {
+    this.degree = {};
+  }
+
+  private clearDegIn() {
+    this.degIn = {};
+  }
+
+  private clearDegOut() {
+    this.degOut = {};
+  }
+
+  private clearMarked() {
+    this.marked = {};
+  }
+
+  private clearNum() {
+    this.num = {};
+  }
+
+  private clearMinNum() {
+    this.minNum = {};
+  }
+
+  private buildMarked() {
+    this.getNodes().forEach((node) => (this.marked[node.id] = false));
+  }
+
+  private buildNum() {
+    this.getNodes().forEach((node) => (this.num[node.id] = -1));
+  }
+
+  private buildMinNum() {
+    this.getNodes().forEach((node) => (this.minNum[node.id] = 0));
+  }
+
+  private init() {
+    this.clearMarked();
+    this.buildMarked();
+    this.clearNum();
+    this.buildNum();
+    this.clearMinNum();
+    this.buildMinNum();
+    this.clearAdjacencyList();
+    this.buildAdjacencyList();
+    this.clearDegree();
+    this.clearDegIn();
+    this.clearDegOut();
+    this.buildDegree();
+  }
+
+  dfsStack(startId: string) {
+    const st = new MyStack<string>();
+
+    st.push(startId);
+    while (!st.isEmpty()) {
+      const u: string = st.top()!;
+      st.pop();
+
+      if (this.marked[u]) continue;
+      this.marked[u] = true;
+
+      const neighbors: string[] = this.adj[u]?.values() || [];
+
+      for (let i = neighbors.length - 1; i >= 0; i--) {
+        const v = neighbors[i];
+        if (!this.marked[v]) {
+          st.push(v);
+        }
+      }
+    }
+  }
+
+  private k: number = 1;
+  private stScc: MyStack<string> = new MyStack<string>();
+  private onStack: { [key: string]: boolean } = {};
+  private num: { [key: string]: number } = {};
+  private minNum: { [key: string]: number } = {};
+  private sccCount: number = 0;
+
+  scc(startId: string) {
+    this.num[startId] = this.minNum[startId] = this.k;
+
+    this.k++;
+    this.stScc.push(startId);
+    this.onStack[startId] = true;
+
+    const neighbors: string[] = this.adj[startId]?.values() || [];
+
+    for (let v = 0; v < neighbors.length; v++) {
+      const endId = neighbors[v];
+      if (this.num[endId] === -1) {
+        this.scc(endId);
+        this.minNum[startId] = Math.min(
+          this.minNum[startId],
+          this.minNum[endId],
+        );
+      } else if (this.onStack[endId]) {
+        this.minNum[startId] = Math.min(this.minNum[startId], this.num[endId]);
+      }
+    }
+
+    if (this.num[startId] === this.minNum[startId]) {
+      let w: string;
+      do {
+        w = this.stScc.pop()!;
+        this.onStack[w] = false;
+      } while (w !== startId);
+      this.sccCount++;
+    }
+  }
+
+  countComponents(): number {
+    this.init(); // reset toàn bộ graph trước khi chạy
+
+    this.k = 1;
+    this.stScc.clear();
+    this.onStack = {};
+    this.sccCount = 0;
+
+    let count = 0;
+
+    if (!this.isDirected) {
+      for (const node of this.getNodes()) {
+        if (!this.marked[node.id]) {
+          count++;
+          this.dfsStack(node.id);
+        }
+      }
+    } else {
+      for (const node of this.getNodes()) {
+        if (this.num[node.id] === -1) {
+          this.scc(node.id);
+        }
+      }
+      count = this.sccCount;
+    }
+
+    return count;
+  }
+
+  isEulerGraph(): boolean {
+    this.init(); // reset toàn bộ graph trước khi chạy
+    const components = this.countComponents();
+
+    if (components > 1) return false;
+
+    for (const node of this.getNodes()) {
+      if (this.isDirected) {
+        const outDeg = this.degOut[node.id] || 0;
+        const inDeg = this.degIn[node.id] || 0;
+
+        if (outDeg !== inDeg) return false;
+      } else {
+        const deg = this.degree[node.id] || 0;
+        if (deg % 2 !== 0) return false;
+      }
+    }
+
+    return true;
+  }
+
+  hasEulerPath(): boolean {
+    this.init();
+    if (this.isEulerGraph()) return true;
+
+    const components = this.countComponents();
+    if (components > 1) return false;
+
+    if (!this.isDirected) {
+      let countNodeHaveOddDegree = 0;
+      for (const node of this.getNodes()) {
+        const deg = this.degree[node.id] || 0;
+        if (deg % 2 !== 0) ++countNodeHaveOddDegree;
+
+        if (countNodeHaveOddDegree > 2) return false;
+      }
+      return countNodeHaveOddDegree === 2;
+    } else {
+      let startNode = 0;
+      let endNode = 0;
+      for (const node of this.getNodes()) {
+        const outDeg = this.degOut[node.id] || 0;
+        const inDeg = this.degIn[node.id] || 0;
+
+        if (outDeg - inDeg === 1) ++startNode;
+        else if (inDeg - outDeg === 1) ++endNode;
+        else if (inDeg !== outDeg) return false;
+
+        if (startNode > 1 || endNode > 1) return false;
+      }
+    }
+
+    return true;
   }
 }

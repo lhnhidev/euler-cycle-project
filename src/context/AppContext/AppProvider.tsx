@@ -6,13 +6,26 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
   const [minimizeDescriptionComponent, setMinimizeDescriptionComponent] =
     useState<boolean>(false);
 
+  const [isDetailedResultHidden, setIsDetailedResultHidden] =
+    useState<boolean>(true);
+
+  const [linesToHighlight, setLinesToHighlight] = useState<number[]>([]);
+
+  const [render, forceRender] = useState<number>(0);
+
   return (
     <AppContext.Provider
       value={{
         ping,
         setPing,
+        isDetailedResultHidden,
+        setIsDetailedResultHidden,
         minimizeDescriptionComponent,
         setMinimizeDescriptionComponent,
+        render,
+        linesToHighlight,
+        forceRender,
+        setLinesToHighlight,
       }}
     >
       {children}

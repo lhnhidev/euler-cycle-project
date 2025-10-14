@@ -1,5 +1,6 @@
 import { useGraphContext } from "@/context/GraphContext";
 import { useEffect, useRef } from "react";
+import ControllBar from "../ControllBar";
 
 const GraphDisplay = () => {
   const cyRef = useRef<HTMLDivElement>(null);
@@ -29,7 +30,14 @@ const GraphDisplay = () => {
   }, []);
 
   return (
-    <div className="relative h-full w-full bg-white" ref={cyRef} id="cy"></div>
+    <>
+      <div
+        className="relative h-[calc(100%-40px)] w-full border border-b-0 border-[var(--primary-color)] bg-white"
+        ref={cyRef}
+        id="cy"
+      ></div>
+      <ControllBar />
+    </>
   );
 };
 export default GraphDisplay;

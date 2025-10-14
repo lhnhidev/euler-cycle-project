@@ -27,7 +27,7 @@ const DirectoryTree = () => {
             </div>
           </div>
         </div>
-        <hr className="mb-2 mt-2" />
+        <hr className="mb-2 mt-2 border-[var(--primary-color)] bg-[var(--primary-color)]" />
 
         <div className="flex-1">
           <DirectoryTreeContent />

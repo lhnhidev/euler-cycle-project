@@ -9,7 +9,7 @@ const EnteringGraph = () => {
   const { minimizeDescriptionComponent, setMinimizeDescriptionComponent } =
     useAppContext();
 
-  const { isDirected, setIsDirected } = useGraphContext();
+  const { isDirected, setIsDirected, graph } = useGraphContext();
 
   return (
     <div className="h-full border-l border-[var(--border-color)] bg-[var(--bg-color)] px-2 py-4">
@@ -37,8 +37,9 @@ const EnteringGraph = () => {
               options={["Vô hướng", "Có hướng"]}
               value={isDirected ? "Có hướng" : "Vô hướng"}
               onChange={(value) => {
-                // console.log(value);
-                setIsDirected(value === "Có hướng" ? true : false);
+                const res = value === "Có hướng" ? true : false;
+                graph.current.setIsDirected(res);
+                setIsDirected(res);
               }}
               size="large"
               block

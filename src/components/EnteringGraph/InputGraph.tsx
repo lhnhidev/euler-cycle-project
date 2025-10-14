@@ -89,6 +89,7 @@ const InputGraph = () => {
       g.changeLabelNodeByClick(document.querySelector("#cy")!);
       g.deleteSelectedNode();
       g.deleteSelectedEdge();
+      g.onChange?.();
     } else {
       console.log("Chưa có số đỉnh hoặc số cạnh hoặc cả 2"); // Not enough information
       openNotificationWithIcon(
@@ -99,6 +100,18 @@ const InputGraph = () => {
       );
       return;
     }
+  };
+
+  const handleReadFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result;
+      if (typeof content === "string") {
+        setInputValue(content);
+      }
+    };
+    handleSubmitInput();
+    reader.readAsText(file);
   };
 
   useEffect(() => {
@@ -173,6 +186,7 @@ const InputGraph = () => {
     return () => {
       viewRef.current?.destroy();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -237,7 +251,13 @@ const InputGraph = () => {
           }}
         >
           <Tooltip placement="top" title="Nhập bằng file .txt">
-            <Upload accept=".txt" beforeUpload={() => false}>
+            <Upload
+              accept=".txt"
+              beforeUpload={(file) => {
+                handleReadFile(file);
+                return false;
+              }}
+            >
               <Button icon={<MdOutlineUploadFile />} className="rounded-sm">
                 Upload file TXT
               </Button>

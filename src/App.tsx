@@ -1,4 +1,5 @@
 import DescriptionComponent from "./components/DescriptionComponent";
+import DetailedResult from "./components/DetailedResult";
 import DirectoryTree from "./components/DirectoryTree";
 import EnteringGraph from "./components/EnteringGraph";
 import GraphDisplay from "./components/GraphDisplay";
@@ -8,7 +9,8 @@ import Window from "./components/Window";
 import { useAppContext } from "./context/AppContext";
 
 function App() {
-  const { minimizeDescriptionComponent } = useAppContext();
+  const { minimizeDescriptionComponent, isDetailedResultHidden } =
+    useAppContext();
 
   return (
     <>
@@ -33,7 +35,7 @@ function App() {
         </div>
 
         <div
-          className={`col-start-4 col-end-[12] row-start-1 bg-pink-300 ${minimizeDescriptionComponent ? "row-end-[14]" : "row-end-8"}`}
+          className={`col-start-4 col-end-[12] row-start-1 flex flex-col bg-pink-300 ${minimizeDescriptionComponent ? "row-end-[14]" : "row-end-8"}`}
         >
           <GraphDisplay />
         </div>
@@ -50,6 +52,8 @@ function App() {
           <EnteringGraph />
         </div>
       </div>
+
+      <DetailedResult isHidden={isDetailedResultHidden} />
     </>
   );
 }
