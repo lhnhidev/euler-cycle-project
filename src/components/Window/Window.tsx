@@ -1,11 +1,11 @@
-import { useAppContext } from "@/context/AppContext";
 import WindowNav from "./WindowNav";
 import WindowTitle from "./WindowTitle";
+import { useGraphContext } from "@/context/GraphContext";
 
 const Window = () => {
-  const { setLinesToHighlight } = useAppContext();
+  const { graph } = useGraphContext();
   const handleSubmit = () => {
-    setLinesToHighlight([1, 5]);
+    graph.current?.buildEulerCycle(graph.current?.getNodes()[0].id);
   };
 
   return (

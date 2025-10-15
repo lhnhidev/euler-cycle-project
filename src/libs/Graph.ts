@@ -4,6 +4,7 @@ import LayoutGraph from "./LayoutGraph";
 import dblclick from "cytoscape-dblclick";
 import MySet from "./data-structures/MySet";
 import MyStack from "./data-structures/MyStack";
+import { ACTION_OPTIONS } from "@/const";
 
 cytoscape.use(dblclick);
 
@@ -934,5 +935,162 @@ export default class Graph {
     }
 
     return true;
+  }
+
+  buildEulerCycle(startId: string): {
+    steps: number;
+    detailSteps: {
+      [key: string]:
+        | number
+        | boolean
+        | string
+        | object
+        | Array<number | string>;
+    }[];
+    circuit: { id: string; label: string }[];
+  } {
+    this.init();
+
+    type GraphCopy = {
+      numberOfNodes: number;
+      isDirected: boolean;
+      nodes: { id: string; label: string }[];
+      edges: { source: string; target: string }[];
+      adj: { [key: string]: MySet<string> };
+    };
+
+    const graphCopy: GraphCopy = {
+      numberOfNodes: this.numberOfNodes,
+      isDirected: this.isDirected,
+      nodes: this.getNodes().map((node) => ({
+        id: node.id,
+        label: node.label,
+      })),
+      edges: this.getEdges().map((edge) => ({
+        source: edge.source,
+        target: edge.target,
+      })),
+      adj: { ...this.adj },
+    };
+
+    const countStepInit = 3;
+
+    if (!this.isEulerGraph()) {
+      return {
+        steps: countStepInit,
+        detailSteps: [1, 2, 3].map((step) => ({
+          step,
+          colorLine: step === 3 ? 19 : step,
+          action: ACTION_OPTIONS.nothing,
+        })),
+        circuit: [],
+      };
+    }
+
+    const detailSteps = [
+      { step: 1, colorLine: 1, action: ACTION_OPTIONS.nothing },
+      { step: 2, colorLine: 2, action: ACTION_OPTIONS.nothing },
+      { step: 3, colorLine: 4, action: ACTION_OPTIONS.nothing },
+      { step: 4, colorLine: 5, action: ACTION_OPTIONS.nothing },
+      { step: 5, colorLine: 6, action: ACTION_OPTIONS.nothing },
+      { step: 6, colorLine: 8, action: ACTION_OPTIONS.nothing },
+    ];
+
+    const stack: MyStack<string> = new MyStack<string>();
+    stack.push(startId);
+
+    const circuit: { id: string; label: string }[] = [];
+
+    let i = 6;
+    while (!stack.isEmpty()) {
+      detailSteps.push(
+        {
+          step: ++i,
+          colorLine: 9,
+          action: ACTION_OPTIONS.nothing,
+        },
+        {
+          step: ++i,
+          colorLine: 11,
+          action: ACTION_OPTIONS.nothing,
+        },
+      );
+      const u = stack.top()!;
+
+      if (graphCopy.adj[u].size() > 0) {
+        detailSteps.push(
+          {
+            step: ++i,
+            colorLine: 12,
+            action: ACTION_OPTIONS.nothing,
+          },
+          {
+            step: ++i,
+            colorLine: 13,
+            action: ACTION_OPTIONS.nothing,
+          },
+          {
+            step: ++i,
+            colorLine: 14,
+            action: ACTION_OPTIONS.nothing,
+          },
+        );
+        const v = graphCopy.adj[u].values()[0];
+
+        stack.push(v);
+        if (graphCopy.isDirected) {
+          graphCopy.adj[u].delete(v);
+        } else {
+          graphCopy.adj[u].delete(v);
+          graphCopy.adj[v].delete(u);
+        }
+      } else {
+        detailSteps.push(
+          {
+            step: ++i,
+            colorLine: 15,
+            action: ACTION_OPTIONS.nothing,
+          },
+          {
+            step: ++i,
+            colorLine: 16,
+            action: ACTION_OPTIONS.nothing,
+          },
+          { step: ++i, colorLine: 17, action: ACTION_OPTIONS.nothing },
+        );
+
+        stack.pop();
+        circuit.push({
+          id: u,
+          label: this.nodes.find((node) => node.id === u)?.label || "",
+        });
+      }
+
+      if (stack.isEmpty()) {
+        detailSteps.push({
+          step: ++i,
+          colorLine: 18,
+          action: ACTION_OPTIONS.nothing,
+        });
+      }
+    }
+
+    detailSteps.push({
+      step: ++i,
+      colorLine: 19,
+      action: ACTION_OPTIONS.nothing,
+    });
+
+    // console.log("Chu trình Euler:", {
+    //   steps: detailSteps.length,
+    //   detailSteps,
+    //   circuit: circuit.reverse(),
+    // });
+
+    return {
+      steps: detailSteps.length,
+      detailSteps,
+      circuit: circuit.reverse(),
+    };
   }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import TitleComponent from "../TitleComponent";
 import { EditorState } from "@codemirror/state";
 import { EditorView, minimalSetup } from "codemirror";
+import { lineNumbers } from "@codemirror/view";
 // import { cpp } from "@codemirror/lang-cpp";
 import {
   boldUppercasePlugin,
@@ -9,56 +9,38 @@ import {
 } from "@/libs/plugin-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { useAppContext } from "@/context/AppContext";
+import TitleComponent from "../TitleComponent";
 import { Select } from "antd";
+import { LANGUAGE_OPTIONS } from "@/const";
 
 const PesudoCode = () => {
+  const { nodeStart } = useAppContext();
+
   const editorRef = useRef(null);
   const { linesToHighlight } = useAppContext();
-  const [lang, setLang] = useState("vn");
+  const [lang, setLang] = useState(LANGUAGE_OPTIONS[2].value);
 
   const handleChange = (value: string) => {
     console.log(`selected ${value}`);
     setLang(value);
   };
 
-  // Các dòng cần bôi vàng
+  const [pesudoCodeEnglish, setPesudoCodeEnglish] = useState(
+    LANGUAGE_OPTIONS[2].pesudoCode(nodeStart),
+  );
+  const [pesudoCodeVietnamese, setPesudoCodeVietnamese] = useState(
+    LANGUAGE_OPTIONS[1].pesudoCode(nodeStart),
+  );
+  const [pesudoCodeCpp, setPesudoCodeCpp] = useState(
+    LANGUAGE_OPTIONS[0].pesudoCode(nodeStart),
+  );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const pesudoCodeEnglish = `BEGIN
-  IF graph infeasible THEN END
-  start ← suitable node
-  tour ← {start}
-  REPEAT
-    current = start ← node in tour with
-                  unvisited edge
-    subtour ← {start}
-    DO
-      {current, u} ← take unvisited edge
-      subtour ← subtour ∪ {u}
-      current ← u
-    WHILE start ≠ current
-    Integrate subtour in tour
-  UNTIL tour is Eulerian path/cycle
-END`;
-
-  const pesudoCodeVietnamese = `BEGIN
-  IF (đồ_thị_không_thoả_điều_kiện_Euler) THEN END
-  start ← chọn đỉnh thích hợp để duyệt
-  tour ← {start}
-  REPEAT
-    current = start ← đỉnh trong tour 
-                      còn cạnh chưa được đi qua
-    subtour ← {start}
-    DO
-      {current, u} ← lấy một cạnh chưa được đi qua
-      subtour ← subtour ∪ {u}
-      current ← u
-    WHILE start ≠ current
-    Hợp nhất subtour vào tour
-  UNTIL tour là đường hoặc chu trình Euler
-KẾT THÚC`;
-
-  const pesudoCodeCpp = `123`;
+  useEffect(() => {
+    console.log(123);
+    setPesudoCodeEnglish(LANGUAGE_OPTIONS[2].pesudoCode(nodeStart));
+    setPesudoCodeVietnamese(LANGUAGE_OPTIONS[1].pesudoCode(nodeStart));
+    setPesudoCodeCpp(LANGUAGE_OPTIONS[0].pesudoCode(nodeStart));
+  }, [nodeStart, nodeStart.label]);
 
   const [pesudoCode, setPesudoCode] = useState(pesudoCodeEnglish);
 
@@ -74,7 +56,7 @@ KẾT THÚC`;
         setPesudoCode(pesudoCodeEnglish);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang]);
+  }, [lang, pesudoCodeEnglish, pesudoCodeVietnamese, pesudoCodeCpp]);
 
   useEffect(() => {
     if (!editorRef.current) return;
@@ -84,9 +66,9 @@ KẾT THÚC`;
       extensions: [
         minimalSetup,
         javascript(),
-        EditorView.editable.of(false),
         boldUppercasePlugin,
         createHighlightPlugin(linesToHighlight),
+        lineNumbers(), // Hiển thị cột số dòng
       ],
     });
 
@@ -111,7 +93,7 @@ KẾT THÚC`;
           children={
             <div>
               <Select
-                defaultValue="vn"
+                defaultValue="en"
                 style={{ width: 105, height: 20, marginRight: 8 }}
                 onChange={handleChange}
                 size="small"

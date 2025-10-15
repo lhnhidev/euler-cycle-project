@@ -14,14 +14,19 @@ export default class MySet<T> {
   }
 
   add(value: T): void {
-    if (!this.has(value)) {
-      this.items.push(value);
-      this.items.sort(this.comparator);
-    }
+    // if (!this.has(value)) {
+    //   this.items.push(value);
+    //   this.items.sort(this.comparator);
+    // }
+    this.items.push(value);
+    this.items.sort(this.comparator);
   }
 
   delete(value: T): void {
-    this.items = this.items.filter((v) => v !== value);
+    const index = this.items.indexOf(value);
+    if (index !== -1) {
+      this.items.splice(index, 1);
+    }
   }
 
   has(value: T): boolean {

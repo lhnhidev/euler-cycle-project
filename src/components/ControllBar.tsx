@@ -12,23 +12,29 @@ import { MdAutoGraph } from "react-icons/md";
 import { RiFileDownloadLine } from "react-icons/ri";
 import DownloadOptions from "./FormatGraphOptions";
 import { BiNetworkChart } from "react-icons/bi";
+import { useAppContext } from "@/context/AppContext";
 
 const ControllBar = () => {
   const { graph } = useGraphContext();
+  const { nodeStart, setNodeStart } = useAppContext();
 
   const [play, setPlay] = useState<boolean>(true);
   const [speak, setSpeak] = useState<boolean>(false);
   const [showDownloadOptions, setShowDownloadOptions] =
     useState<boolean>(false);
 
-  const [nodeStart, setNodeStart] = useState<{ id: string; label: string }>({
-    id: "",
-    label: "",
-  });
   const [inputValue, setInputValue] = useState(2);
 
   const onChange: InputNumberProps["onChange"] = (newValue) => {
     setInputValue(newValue as number);
+  };
+
+  const handlePlay = () => {
+    setPlay(!play);
+    const info = graph.current?.buildEulerCycle(
+      graph.current?.getNodes()[0].id,
+    );
+    console.log("info", info);
   };
 
   const randomNodeStart = () => {
@@ -120,9 +126,18 @@ const ControllBar = () => {
 
         <div className="flex items-center gap-4 text-[20px]">
           <div className="flex items-center gap-2">
-            <ImPrevious2 />
-            {play ? <IoIosPlay /> : <IoIosPause />}
-            <ImNext2 />
+            <div className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300">
+              <ImPrevious2 />
+            </div>
+            <div
+              className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"
+              onClick={handlePlay}
+            >
+              {play ? <IoIosPlay /> : <IoIosPause />}
+            </div>
+            <div className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300">
+              <ImNext2 />
+            </div>
           </div>
 
           <div className="flex items-center gap-2">

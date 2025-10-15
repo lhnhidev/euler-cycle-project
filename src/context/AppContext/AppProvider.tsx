@@ -13,6 +13,11 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const [render, forceRender] = useState<number>(0);
 
+  const [nodeStart, setNodeStart] = useState<{ id: string; label: string }>({
+    id: "",
+    label: "",
+  });
+
   return (
     <AppContext.Provider
       value={{
@@ -26,6 +31,8 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
         linesToHighlight,
         forceRender,
         setLinesToHighlight,
+        nodeStart,
+        setNodeStart,
       }}
     >
       {children}

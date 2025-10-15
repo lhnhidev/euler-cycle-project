@@ -13,6 +13,10 @@ export interface AppContextType {
   linesToHighlight: number[];
   setLinesToHighlight: React.Dispatch<React.SetStateAction<number[]>>;
   forceRender: React.Dispatch<React.SetStateAction<number>>;
+  nodeStart: { id: string; label: string };
+  setNodeStart: React.Dispatch<
+    React.SetStateAction<{ id: string; label: string }>
+  >;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
