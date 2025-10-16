@@ -15,7 +15,7 @@ export default class Graph {
   private numberOfNodes: number = 0;
   private isDirected: boolean = true;
   private nodes: { id: string; label: string }[];
-  private edges: { source: string; target: string }[];
+  private edges: { source: string; target: string; id: string }[];
   private _keydownHandler?: (e: KeyboardEvent) => void;
   private isChangeingLabelMode: boolean = false;
   private listeners: Listener[] = [];
@@ -135,8 +135,9 @@ export default class Graph {
     return true;
   }
 
-  addEdge(sourceId: string, targetId: string): boolean {
+  addEdge(sourceId: string, targetId: string, idEdge: string): boolean {
     // Nút nguồn và đích phải tồn tại
+
     if (!this.nodes.find((node) => node.id === sourceId)) {
       console.log(`Nút có id là ${sourceId} không tồn tại.`);
       return false;
@@ -148,7 +149,7 @@ export default class Graph {
     }
     //
 
-    this.edges.push({ source: sourceId, target: targetId });
+    this.edges.push({ source: sourceId, target: targetId, id: idEdge });
     this.notify();
     this.onChange?.();
     return true;
@@ -223,7 +224,7 @@ export default class Graph {
     }
 
     if (!container) {
-      console.log("Container không hợp lệ");
+      // console.log("Container không hợp lệ");
       throw new Error("Container không hợp lệ");
     }
 
@@ -236,7 +237,7 @@ export default class Graph {
     const edgeElements = this.edges.map((edge) => {
       return {
         data: {
-          id: `${edge.source}-${edge.target}`,
+          id: edge.id,
           source: edge.source,
           target: edge.target,
         },
@@ -333,7 +334,7 @@ export default class Graph {
     this.cy.on("cxttap", (event) => {
       const { x, y } = event.position;
       const renderedPos = event.renderedPosition;
-      const nodeId = `${Date.now()}`;
+      const nodeId = `${crypto.randomUUID()}`;
       // const nodeId = (this.cy!.elements().length + 1).toString();
 
       // Thêm node mới với label tạm
@@ -615,10 +616,12 @@ export default class Graph {
 
         // if (targetNode!.id() !== sourceNode.id()) {
         // }
+        const idEdge = `${sourceNode.id()}-${targetNode!.id()}-${crypto.randomUUID()}`;
+
         const newEdge = this.cy!.add({
           group: "edges",
           data: {
-            id: `${sourceNode.id()}-${targetNode!.id()}-${Date.now()}`,
+            id: idEdge,
             source: sourceNode.id(),
             target: targetNode!.id(),
           },
@@ -629,7 +632,7 @@ export default class Graph {
           "curve-style": "bezier",
         });
 
-        this.addEdge(sourceNode.id(), targetNode!.id());
+        this.addEdge(sourceNode.id(), targetNode!.id(), idEdge);
         console.log(`Tạo cạnh: ${sourceNode.id()} -> ${targetNode!.id()}`);
 
         // reset state
@@ -689,12 +692,15 @@ export default class Graph {
       // Không nối vào chính nó
       if (sourceIdx === targetIdx) continue;
       const edgeKey = this.isDirected
-        ? `${sourceIdx}-${targetIdx}`
-        : [sourceIdx, targetIdx].sort().join("-");
+        ? `${sourceIdx}-${targetIdx}-${crypto.randomUUID()}`
+        : [...[sourceIdx, targetIdx].sort(), `-${crypto.randomUUID()}`].join(
+            "-",
+          );
       if (edgeSet.has(edgeKey)) continue;
       edgeSet.add(edgeKey);
-      this.addEdge(sourceIdx.toString(), targetIdx.toString());
+      this.addEdge(sourceIdx.toString(), targetIdx.toString(), edgeKey);
     }
+
     this.display(container, true);
     this.addNodeByClick(container);
     this.addEdgeByClick();

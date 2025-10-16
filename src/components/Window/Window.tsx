@@ -1,3 +1,4 @@
+import { ACTION_OPTIONS } from "@/const";
 import WindowNav from "./WindowNav";
 import WindowTitle from "./WindowTitle";
 import { useGraphContext } from "@/context/GraphContext";
@@ -5,7 +6,16 @@ import { useGraphContext } from "@/context/GraphContext";
 const Window = () => {
   const { graph } = useGraphContext();
   const handleSubmit = () => {
-    graph.current?.buildEulerCycle(graph.current?.getNodes()[0].id);
+    console.log(graph.current.getNodes());
+    console.log(graph.current.getEdges());
+    ACTION_OPTIONS.colorNode(graph.current!, "1", "pink");
+    // console.log(graph.current!.getEdges()[0].id);
+    ACTION_OPTIONS.colorEdge(
+      graph.current!,
+      graph.current!.getEdges()[0].id,
+      "red",
+    );
+    ACTION_OPTIONS.colorLabel(graph.current!, "1", "blue");
   };
 
   return (

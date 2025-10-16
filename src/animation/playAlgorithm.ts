@@ -9,7 +9,7 @@ function* infoGenerator(
   }[],
 ) {
   for (const item of info) {
-    yield item.action(graph, id, color);
+    yield item.action(graph);
   }
 }
 
