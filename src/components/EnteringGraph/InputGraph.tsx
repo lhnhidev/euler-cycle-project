@@ -80,7 +80,7 @@ const InputGraph = () => {
       edges.forEach((edge) => {
         const id1 = g.getNodeIdByLabel(edge[0]);
         const id2 = g.getNodeIdByLabel(edge[1]);
-        g.addEdge(id1!, id2!);
+        g.addEdge(id1!, id2!, `${id1}-${id2}-${crypto.randomUUID()}`);
       });
 
       g.display(document.querySelector("#cy")!, true);

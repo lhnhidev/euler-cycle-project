@@ -36,7 +36,6 @@ const PesudoCode = () => {
   );
 
   useEffect(() => {
-    console.log(123);
     setPesudoCodeEnglish(LANGUAGE_OPTIONS[2].pesudoCode(nodeStart));
     setPesudoCodeVietnamese(LANGUAGE_OPTIONS[1].pesudoCode(nodeStart));
     setPesudoCodeCpp(LANGUAGE_OPTIONS[0].pesudoCode(nodeStart));
