@@ -1,16 +1,14 @@
-import { run } from "@/animation/playAlgorithm";
 import WindowNav from "./WindowNav";
 import WindowTitle from "./WindowTitle";
 import { useGraphContext } from "@/context/GraphContext";
-import { useAppContext } from "@/context/AppContext";
+// import { useAppContext } from "@/context/AppContext";
 
 const Window = () => {
   const { graph } = useGraphContext();
-  const { setLinesToHighlight } = useAppContext();
+  // const { setLinesToHighlight } = useAppContext();
   const handleSubmit = () => {
     const res = graph.current.buildEulerCycle("0");
     console.log(res);
-    run(graph.current, { detailSteps: res.detailSteps }, setLinesToHighlight);
   };
 
   return (

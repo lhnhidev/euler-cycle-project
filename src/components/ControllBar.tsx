@@ -1,6 +1,6 @@
 import { useGraphContext } from "@/context/GraphContext";
 import { Input, Slider, Tooltip, type InputNumberProps } from "antd";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   GiPerspectiveDiceSixFacesRandom,
   GiSpeaker,
@@ -13,28 +13,115 @@ import { RiFileDownloadLine } from "react-icons/ri";
 import DownloadOptions from "./FormatGraphOptions";
 import { BiNetworkChart } from "react-icons/bi";
 import { useAppContext } from "@/context/AppContext";
+import { useNotificationWithIcon } from "@/services/notify";
+import { createRunner } from "@/animation/playAlgorithm";
+import type { DetailSteps } from "@/libs/Graph";
 
 const ControllBar = () => {
   const { graph } = useGraphContext();
-  const { nodeStart, setNodeStart } = useAppContext();
+  const { nodeStart, setNodeStart, setLinesToHighlight } = useAppContext();
 
-  const [play, setPlay] = useState<boolean>(true);
+  const [play, setPlay] = useState<boolean>(false);
   const [speak, setSpeak] = useState<boolean>(false);
   const [showDownloadOptions, setShowDownloadOptions] =
     useState<boolean>(false);
-
-  const [inputValue, setInputValue] = useState(2);
+  const [sliderValue, setSliderValue] = useState<number>(0);
+  const [maxSliderValue, setMaxSliderValue] = useState<number>(1);
+  const [speed, setSpeed] = useState<number>(2);
+  const speedRef = useRef(speed);
+  speedRef.current = speed;
 
   const onChange: InputNumberProps["onChange"] = (newValue) => {
-    setInputValue(newValue as number);
+    setSpeed(newValue as number);
   };
 
-  const handlePlay = () => {
-    setPlay(!play);
-    const info = graph.current?.buildEulerCycle(
-      graph.current?.getNodes()[0].id,
+  const openNotificationWithIcon = useNotificationWithIcon();
+
+  const [info, setInfo] = useState<{
+    steps: number;
+    detailSteps: DetailSteps[];
+    circuit: {
+      id: string;
+      label: string;
+    }[];
+  }>({
+    steps: 0,
+    detailSteps: [],
+    circuit: [],
+  });
+
+  useEffect(() => {
+    setInfo(graph.current?.buildEulerCycle(nodeStart.id));
+    console.log(info);
+    setMaxSliderValue(info.steps);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodeStart.id]);
+
+  const runnerRef = useRef<ReturnType<typeof createRunner> | null>(null);
+
+  useEffect(() => {
+    if (!graph.current || info.detailSteps.length === 0) return;
+
+    // Ngừng runner cũ nếu có
+    runnerRef.current?.pause();
+
+    // Tạo runner mới
+    runnerRef.current = createRunner(
+      graph.current,
+      info, // ✅ Truyền toàn bộ info, không chỉ detailSteps
+      setLinesToHighlight,
+      () => 1500 / speedRef.current,
+      setSliderValue,
+      setPlay,
     );
-    console.log("info", info);
+
+    setMaxSliderValue(info.detailSteps.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [graph.current, info.detailSteps]);
+
+  useEffect(() => {
+    console.log(graph.current);
+  }, [graph, graph.current]);
+
+  useEffect(() => {
+    const runner = runnerRef.current;
+    if (!runner) return;
+
+    if (play) {
+      console.log("▶ Bắt đầu chạy");
+      runner.play();
+    } else {
+      console.log("⏸ Dừng lại");
+      runner.pause();
+    }
+  }, [play]);
+
+  const handlePlay = () => {
+    if (!nodeStart.id) {
+      openNotificationWithIcon(
+        "error",
+        "Chưa chọn đỉnh bắt đầu",
+        "Vui lòng chọn một đỉnh bắt đầu để tiếp tục",
+        "bottomRight",
+      );
+      return;
+    }
+    setPlay(!play);
+  };
+
+  const handleNext = () => {
+    if (play) return;
+    runnerRef.current?.next();
+  };
+
+  const handlePrev = () => {
+    if (play) return;
+    runnerRef.current?.prev();
+  };
+
+  const handleSliderChange = (value: number) => {
+    if (play) return;
+    runnerRef.current?.seek(value);
   };
 
   const randomNodeStart = () => {
@@ -82,9 +169,10 @@ const ControllBar = () => {
     >
       <div>
         <Slider
-          min={1}
-          max={100}
-          defaultValue={32}
+          min={0}
+          max={maxSliderValue - 1}
+          value={sliderValue}
+          onChange={handleSliderChange}
           style={{ margin: 0, padding: 0, height: "4px" }}
           handleStyle={{
             opacity: 0, // ẩn nhưng vẫn giữ tooltip
@@ -92,7 +180,7 @@ const ControllBar = () => {
           }}
           tooltip={{
             // open: true,
-            formatter: (value) => `${value}/${100}`, // định dạng nội dung tooltip
+            formatter: (value) => `${value}/${maxSliderValue - 1}`, // định dạng nội dung tooltip
           }}
           trackStyle={{
             backgroundColor: "var(--secondary-color)",
@@ -116,26 +204,32 @@ const ControllBar = () => {
               max={5}
               defaultValue={2}
               onChange={onChange}
-              value={typeof inputValue === "number" ? inputValue : 0}
+              value={typeof speed === "number" ? speed : 0}
               railStyle={{ backgroundColor: "white" }}
               trackStyle={{ backgroundColor: "var(--secondary-color)" }}
             />
           </div>
-          <div>{typeof inputValue === "number" ? inputValue : 0}x</div>
+          <div>{typeof speed === "number" ? speed : 0}x</div>
         </div>
 
         <div className="flex items-center gap-4 text-[20px]">
           <div className="flex items-center gap-2">
-            <div className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300">
+            <div
+              onClick={() => handlePrev()}
+              className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"
+            >
               <ImPrevious2 />
             </div>
             <div
               className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"
               onClick={handlePlay}
             >
-              {play ? <IoIosPlay /> : <IoIosPause />}
+              {!play ? <IoIosPlay /> : <IoIosPause />}
             </div>
-            <div className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300">
+            <div
+              onClick={() => handleNext()}
+              className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"
+            >
               <ImNext2 />
             </div>
           </div>

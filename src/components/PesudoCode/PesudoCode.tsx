@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { EditorState } from "@codemirror/state";
+import { Compartment, EditorState } from "@codemirror/state";
 import { EditorView, minimalSetup } from "codemirror";
 import { lineNumbers } from "@codemirror/view";
-// import { cpp } from "@codemirror/lang-cpp";
 import {
   boldUppercasePlugin,
   createHighlightPlugin,
@@ -13,50 +12,39 @@ import TitleComponent from "../TitleComponent";
 import { Select } from "antd";
 import { LANGUAGE_OPTIONS } from "@/const";
 
-const PesudoCode = () => {
-  const { nodeStart } = useAppContext();
+// ✅ Chỉ tạo 1 compartment duy nhất
+const highlightCompartment = new Compartment();
 
-  const editorRef = useRef(null);
-  const { linesToHighlight } = useAppContext();
+const PesudoCode = () => {
+  const editorRef = useRef<HTMLDivElement | null>(null);
+  const viewRef = useRef<EditorView | null>(null);
+
+  const { nodeStart, linesToHighlight } = useAppContext();
   const [lang, setLang] = useState(LANGUAGE_OPTIONS[2].value);
 
-  const handleChange = (value: string) => {
-    console.log(`selected ${value}`);
-    setLang(value);
-  };
-
-  const [pesudoCodeEnglish, setPesudoCodeEnglish] = useState(
+  const [pesudoCode, setPesudoCode] = useState(
     LANGUAGE_OPTIONS[2].pesudoCode(nodeStart),
   );
-  const [pesudoCodeVietnamese, setPesudoCodeVietnamese] = useState(
-    LANGUAGE_OPTIONS[1].pesudoCode(nodeStart),
-  );
-  const [pesudoCodeCpp, setPesudoCodeCpp] = useState(
-    LANGUAGE_OPTIONS[0].pesudoCode(nodeStart),
-  );
 
+  // ✅ Cập nhật nội dung mã giả khi nodeStart hoặc lang thay đổi
   useEffect(() => {
-    setPesudoCodeEnglish(LANGUAGE_OPTIONS[2].pesudoCode(nodeStart));
-    setPesudoCodeVietnamese(LANGUAGE_OPTIONS[1].pesudoCode(nodeStart));
-    setPesudoCodeCpp(LANGUAGE_OPTIONS[0].pesudoCode(nodeStart));
-  }, [nodeStart, nodeStart.label]);
+    const english = LANGUAGE_OPTIONS[2].pesudoCode(nodeStart);
+    const vn = LANGUAGE_OPTIONS[1].pesudoCode(nodeStart);
+    const cpp = LANGUAGE_OPTIONS[0].pesudoCode(nodeStart);
 
-  const [pesudoCode, setPesudoCode] = useState(pesudoCodeEnglish);
-
-  useEffect(() => {
     switch (lang) {
       case "cpp":
-        setPesudoCode(pesudoCodeCpp);
+        setPesudoCode(cpp);
         break;
       case "vn":
-        setPesudoCode(pesudoCodeVietnamese);
+        setPesudoCode(vn);
         break;
       default:
-        setPesudoCode(pesudoCodeEnglish);
+        setPesudoCode(english);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lang, pesudoCodeEnglish, pesudoCodeVietnamese, pesudoCodeCpp]);
+  }, [lang, nodeStart]);
 
+  // ✅ Khởi tạo EditorView chỉ 1 lần
   useEffect(() => {
     if (!editorRef.current) return;
 
@@ -65,9 +53,9 @@ const PesudoCode = () => {
       extensions: [
         minimalSetup,
         javascript(),
+        lineNumbers(),
         boldUppercasePlugin,
-        createHighlightPlugin(linesToHighlight),
-        lineNumbers(), // Hiển thị cột số dòng
+        highlightCompartment.of(createHighlightPlugin(linesToHighlight)),
       ],
     });
 
@@ -76,46 +64,70 @@ const PesudoCode = () => {
       parent: editorRef.current,
     });
 
-    return () => view.destroy(); // cleanup khi component unmount
-  }, [linesToHighlight, pesudoCode]);
+    viewRef.current = view;
+
+    return () => {
+      view.destroy();
+      viewRef.current = null;
+    };
+  }, []); // chỉ chạy 1 lần
+
+  // ✅ Cập nhật highlight mà không reset editor
+  useEffect(() => {
+    if (!viewRef.current) return;
+    const view = viewRef.current;
+
+    view.dispatch({
+      effects: highlightCompartment.reconfigure(
+        createHighlightPlugin(linesToHighlight),
+      ),
+    });
+  }, [linesToHighlight]);
+
+  // ✅ Khi đổi ngôn ngữ hoặc nodeStart → cập nhật nội dung
+  useEffect(() => {
+    if (viewRef.current) {
+      viewRef.current.dispatch({
+        changes: {
+          from: 0,
+          to: viewRef.current.state.doc.length,
+          insert: pesudoCode,
+        },
+      });
+    }
+  }, [pesudoCode]);
 
   return (
     <div className="flex h-full flex-col">
-      <div>
-        <TitleComponent
-          title="Mã giả chương trình"
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-          children={
-            <div>
-              <Select
-                defaultValue="en"
-                style={{ width: 105, height: 20, marginRight: 8 }}
-                onChange={handleChange}
-                size="small"
-                options={[
-                  { value: "cpp", label: "C++" },
-                  { value: "vn", label: "Tiếng Việt" },
-                  { value: "en", label: "English" },
-                ]}
-              />
-            </div>
-          }
-        ></TitleComponent>
-      </div>
-
+      <TitleComponent
+        title="Mã giả chương trình"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+        children={
+          <Select
+            defaultValue="en"
+            style={{ width: 105, height: 20, marginRight: 8 }}
+            onChange={(value) => setLang(value)}
+            size="small"
+            options={[
+              { value: "cpp", label: "C++" },
+              { value: "vn", label: "Tiếng Việt" },
+              { value: "en", label: "English" },
+            ]}
+          />
+        }
+      />
       <div className="flex-1 overflow-auto bg-[var(--bg-color)] p-2">
         <div
           className="h-full w-full overflow-hidden rounded-sm bg-white"
           ref={editorRef}
-        >
-          {/* Component mã giả sẽ đặt ở đây */}
-        </div>
+        />
       </div>
     </div>
   );
 };
+
 export default PesudoCode;
