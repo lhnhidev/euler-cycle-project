@@ -8,7 +8,7 @@ import {
 } from "react-icons/gi";
 import { ImNext2, ImPrevious2 } from "react-icons/im";
 import { IoIosPause, IoIosPlay } from "react-icons/io";
-import { MdAutoGraph } from "react-icons/md";
+import { MdAutoGraph, MdOutlineLoop } from "react-icons/md";
 import { RiFileDownloadLine } from "react-icons/ri";
 import DownloadOptions from "./FormatGraphOptions";
 import { BiNetworkChart } from "react-icons/bi";
@@ -19,9 +19,10 @@ import type { DetailSteps } from "@/libs/Graph";
 
 const ControllBar = () => {
   const { graph } = useGraphContext();
-  const { nodeStart, setNodeStart, setLinesToHighlight } = useAppContext();
+  const { nodeStart, setNodeStart, setLinesToHighlight, play, setPlay } =
+    useAppContext();
 
-  const [play, setPlay] = useState<boolean>(false);
+  // const [play, setPlay] = useState<boolean>(false);
   const [speak, setSpeak] = useState<boolean>(false);
   const [showDownloadOptions, setShowDownloadOptions] =
     useState<boolean>(false);
@@ -50,12 +51,11 @@ const ControllBar = () => {
     circuit: [],
   });
 
-  useEffect(() => {
-    setInfo(graph.current?.buildEulerCycle(nodeStart.id));
-    console.log(info);
-    setMaxSliderValue(info.steps);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodeStart.id]);
+  // useEffect(() => {
+  //   setInfo(graph.current?.buildEulerCycle(nodeStart.id));
+  //   setMaxSliderValue(info.steps);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [nodeStart.id]);
 
   const runnerRef = useRef<ReturnType<typeof createRunner> | null>(null);
 
@@ -80,10 +80,6 @@ const ControllBar = () => {
   }, [graph.current, info.detailSteps]);
 
   useEffect(() => {
-    console.log(graph.current);
-  }, [graph, graph.current]);
-
-  useEffect(() => {
     const runner = runnerRef.current;
     if (!runner) return;
 
@@ -96,8 +92,8 @@ const ControllBar = () => {
     }
   }, [play]);
 
-  const handlePlay = () => {
-    if (!nodeStart.id) {
+  const handlePlay = (run: boolean) => {
+    if (!nodeStart.id && !nodeStart.label) {
       openNotificationWithIcon(
         "error",
         "Chưa chọn đỉnh bắt đầu",
@@ -106,7 +102,23 @@ const ControllBar = () => {
       );
       return;
     }
-    setPlay(!play);
+
+    if (!nodeStart.id && nodeStart.label) {
+      openNotificationWithIcon(
+        "error",
+        "Đỉnh bắt đầu không hợp lệ",
+        "Vui lòng chọn một đỉnh nằm trong đồ thị",
+        "bottomRight",
+      );
+      return;
+    }
+
+    setInfo(graph.current?.buildEulerCycle(nodeStart.id));
+    setMaxSliderValue(info.steps);
+
+    if (run) {
+      setPlay(!play);
+    }
   };
 
   const handleNext = () => {
@@ -129,7 +141,6 @@ const ControllBar = () => {
 
     if (nodeList && nodeList.length > 0) {
       const randomIndex = Math.floor(Math.random() * (nodeList.length - 1 + 1)); // từ 0 đến nodeList.length - 1
-      console.log(nodeList[randomIndex]);
       setNodeStart(nodeList[randomIndex] || { id: "", label: "" });
     }
   };
@@ -157,6 +168,13 @@ const ControllBar = () => {
         setNodeStart({ id: foundNode.id, label: foundNode.label });
       }
     }
+  };
+
+  const handleReverseGraph = () => {
+    handlePlay(false);
+    setSliderValue(0);
+    setPlay(false);
+    runnerRef.current?.seek(0);
   };
 
   return (
@@ -216,19 +234,19 @@ const ControllBar = () => {
           <div className="flex items-center gap-2">
             <div
               onClick={() => handlePrev()}
-              className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"
+              className={`${play ? "text-gray-400" : "hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"}`}
             >
               <ImPrevious2 />
             </div>
             <div
               className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"
-              onClick={handlePlay}
+              onClick={() => handlePlay(true)}
             >
               {!play ? <IoIosPlay /> : <IoIosPause />}
             </div>
             <div
               onClick={() => handleNext()}
-              className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"
+              className={`${play ? "text-gray-400" : "hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"}`}
             >
               <ImNext2 />
             </div>
@@ -246,13 +264,22 @@ const ControllBar = () => {
             <Tooltip title="Chọn đỉnh ngẫu nhiên" placement="top">
               <GiPerspectiveDiceSixFacesRandom
                 onClick={randomNodeStart}
-                className="text-[18px] hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"
+                className={`text-[18px] ${play ? "text-gray-400" : "hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"}`}
               />
             </Tooltip>
           </div>
         </div>
 
         <div className="flex items-center gap-3 text-[22px]">
+          <div
+            onClick={handleReverseGraph}
+            className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"
+          >
+            <Tooltip title="Đặt lại đồ thị" placement="top">
+              <MdOutlineLoop />
+            </Tooltip>
+          </div>
+
           <div className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300">
             <Tooltip
               title={speak ? "Tắt âm thanh" : "Bật âm thanh"}
@@ -267,7 +294,7 @@ const ControllBar = () => {
             </div>
             <div
               onClick={() => setShowDownloadOptions(!showDownloadOptions)}
-              className={`hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300 ${showDownloadOptions ? "text-[var(--secondary-color)]" : ""}`}
+              className={`${play ? "cursor-default text-gray-400" : "hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"} ${showDownloadOptions ? "text-[var(--secondary-color)]" : ""}`}
             >
               <Tooltip
                 title={`${showDownloadOptions ? "Ẩn" : "Hiện"} tùy chọn điều chỉnh đồ thị`}

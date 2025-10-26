@@ -48,22 +48,67 @@ const CSSGraph = (isDirected: boolean): StylesheetJson => {
         "curve-style": "bezier",
       },
     },
+    // Các trạng thái tạm thời khi đang chạy thuật toán — dùng class thay vì inline styles
+    {
+      selector: "node.algo-chosen",
+      style: {
+        "background-color": BG_COLOR_NODE_CHOOSED,
+        color: COLOR_NODE_CHOOSED,
+      },
+    },
+    {
+      selector: "node.algo-stacked",
+      style: {
+        "background-color": BG_COLOR_NODE_STACKED,
+        color: COLOR_NODE_STACKED,
+      },
+    },
+    {
+      selector: "node.algo-cycled",
+      style: {
+        "background-color": BG_COLOR_NODE_CYCLED,
+        color: COLOR_NODE_CYCLED,
+      },
+    },
+    {
+      selector: "node.algo-deleted",
+      style: {
+        "background-color": BG_COLOR_NODE_DELETED_STATE,
+        color: COLOR_NODE_DELETED_STATE,
+      },
+    },
+    {
+      selector: "edge.algo-edge-chosen",
+      style: {
+        "line-color": COLOR_EDGE_CHOOSED,
+        "target-arrow-color": COLOR_EDGE_CHOOSED,
+        width: 3,
+      },
+    },
+    {
+      selector: "edge.algo-edge-checked",
+      style: {
+        "line-color": COLOR_EDGE_CHECKED,
+        "target-arrow-color": COLOR_EDGE_CHECKED,
+        width: 3,
+      },
+    },
     {
       selector: "node:selected",
       style: {
         "background-color": "white",
-        "border-color": COLOR_BORDER_CLICKED,
-        "border-width": 3,
-        color: COLOR_NODE_CLICKED,
+        "border-color": `${COLOR_BORDER_CLICKED}`,
+        "border-width": `${3}`,
+        color: `${COLOR_NODE_CLICKED}`,
       },
     },
     // Khi chọn edge thì highlight
     {
       selector: "edge:selected",
       style: {
-        "line-color": COLOR_EDGE_CLICKED,
-        "target-arrow-color": COLOR_TARGET_ARROW_EDGE_CLICKED,
-        width: 4,
+        "line-color": `${COLOR_EDGE_CLICKED}`,
+        "target-arrow-color": `${COLOR_TARGET_ARROW_EDGE_CLICKED}`,
+        width: `${4}`,
       },
     },
   ];

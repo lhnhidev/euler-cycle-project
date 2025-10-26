@@ -1,11 +1,12 @@
 import { useGraphContext } from "@/context/GraphContext";
 import { useEffect, useRef } from "react";
 import ControllBar from "../ControllBar";
+import { useAppContext } from "@/context/AppContext";
 
 const GraphDisplay = () => {
   const cyRef = useRef<HTMLDivElement>(null);
-  const { graph } = useGraphContext();
-  const { isDirected } = useGraphContext();
+  const { graph, isDirected } = useGraphContext();
+  const { play } = useAppContext();
 
   useEffect(() => {
     graph.current.setIsDirected(isDirected);
@@ -31,11 +32,12 @@ const GraphDisplay = () => {
 
   return (
     <>
-      <div
-        className="relative h-[calc(100%-40px)] w-full border border-b-0 border-[var(--primary-color)] bg-white"
-        ref={cyRef}
-        id="cy"
-      ></div>
+      <div className="relative h-[calc(100%-40px)] w-full border border-b-0 border-[var(--primary-color)]">
+        <div
+          className={`absolute left-0 right-0 top-0 h-full w-full ${play ? "z-[100]" : "z-[-100]"}`}
+        ></div>
+        <div className="h-full w-full bg-white" ref={cyRef} id="cy"></div>
+      </div>
       <ControllBar />
     </>
   );

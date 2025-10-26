@@ -18,6 +18,8 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
     label: "",
   });
 
+  const [play, setPlay] = useState<boolean>(false);
+
   return (
     <AppContext.Provider
       value={{
@@ -33,6 +35,8 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
         setLinesToHighlight,
         nodeStart,
         setNodeStart,
+        play,
+        setPlay,
       }}
     >
       {children}

@@ -17,6 +17,8 @@ export interface AppContextType {
   setNodeStart: React.Dispatch<
     React.SetStateAction<{ id: string; label: string }>
   >;
+  play: boolean;
+  setPlay: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
