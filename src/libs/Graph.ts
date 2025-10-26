@@ -253,6 +253,30 @@ export default class Graph {
     // this.notify();
   }
 
+  formatGraph(
+    bgColorNode: string,
+    colorLabel: string,
+    colorEdge: string,
+    targetArrowColor: string,
+    nodeSize: number,
+    // edgeLength: number,
+  ) {
+    if (!this.cy) return;
+    this.cy
+      .style()
+      .fromJson(
+        CSSGraph(
+          this.getIsDirected(),
+          bgColorNode,
+          colorLabel,
+          colorEdge,
+          targetArrowColor,
+          nodeSize,
+        ),
+      )
+      .update();
+  }
+
   display(container: HTMLDivElement, isRandom = false): () => void {
     if (this.cy) {
       this.cy!.dblclick(200);

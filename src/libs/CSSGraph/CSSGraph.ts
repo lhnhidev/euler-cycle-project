@@ -26,24 +26,36 @@ export const COLOR_NODE_DELETED_STATE = "white";
 export const BG_COLOR_NODE_CYCLED = "brown";
 export const COLOR_NODE_CYCLED = "white";
 
-const CSSGraph = (isDirected: boolean): StylesheetJson => {
+const CSSGraph = (
+  isDirected: boolean,
+  bgColorNode?: string,
+  colorLabel?: string,
+  colorEdge?: string,
+  targetArrowColor?: string,
+  nodeSize?: number,
+  // edgeLength?: number,
+): StylesheetJson => {
   return [
     {
       selector: "node",
       style: {
-        "background-color": BG_COLOR_NODE,
+        "background-color": bgColorNode ? bgColorNode : BG_COLOR_NODE,
         label: "data(label)",
-        color: COLOR_NODE,
+        color: colorLabel ? colorLabel : COLOR_NODE,
         "text-valign": "center",
         "text-halign": "center",
+        width: nodeSize ? nodeSize : 30,
+        height: nodeSize ? nodeSize : 30,
       },
     },
     {
       selector: "edge",
       style: {
         width: 2,
-        "line-color": COLOR_EDGE,
-        "target-arrow-color": COLOR_TARGET_ARROW_EDGE,
+        "line-color": colorEdge ? colorEdge : COLOR_EDGE,
+        "target-arrow-color": targetArrowColor
+          ? targetArrowColor
+          : COLOR_TARGET_ARROW_EDGE,
         "target-arrow-shape": isDirected ? "triangle" : "none",
         "curve-style": "bezier",
       },

@@ -10,12 +10,13 @@ import { ImNext2, ImPrevious2 } from "react-icons/im";
 import { IoIosPause, IoIosPlay } from "react-icons/io";
 import { MdAutoGraph, MdOutlineLoop } from "react-icons/md";
 import { RiFileDownloadLine } from "react-icons/ri";
-import DownloadOptions from "./FormatGraphOptions";
+import FormatGraphOptions from "./FormatGraphOptions";
 import { BiNetworkChart } from "react-icons/bi";
 import { useAppContext } from "@/context/AppContext";
 import { useNotificationWithIcon } from "@/services/notify";
 import { createRunner } from "@/animation/playAlgorithm";
 import type { DetailSteps } from "@/libs/Graph";
+import DownloadGraph from "./DownloadGraph";
 
 const ControllBar = () => {
   const { graph } = useGraphContext();
@@ -24,8 +25,8 @@ const ControllBar = () => {
 
   // const [play, setPlay] = useState<boolean>(false);
   const [speak, setSpeak] = useState<boolean>(false);
-  const [showDownloadOptions, setShowDownloadOptions] =
-    useState<boolean>(false);
+  const [showFormatOption, setShowFormatOption] = useState<boolean>(false);
+  const [showDownloadOption, setShowDownloadOption] = useState<boolean>(false);
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [maxSliderValue, setMaxSliderValue] = useState<number>(1);
   const [speed, setSpeed] = useState<number>(2);
@@ -92,6 +93,12 @@ const ControllBar = () => {
     }
   }, [play]);
 
+  useEffect(() => {
+    setInfo(graph.current?.buildEulerCycle(nodeStart.id));
+    setMaxSliderValue(info.steps);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodeStart.id]);
+
   const handlePlay = (run: boolean) => {
     if (!nodeStart.id && !nodeStart.label) {
       openNotificationWithIcon(
@@ -112,9 +119,6 @@ const ControllBar = () => {
       );
       return;
     }
-
-    setInfo(graph.current?.buildEulerCycle(nodeStart.id));
-    setMaxSliderValue(info.steps);
 
     if (run) {
       setPlay(!play);
@@ -290,14 +294,14 @@ const ControllBar = () => {
           </div>
           <div className="relative hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300">
             <div className="absolute bottom-[calc(100%+15px)] right-[-30px]">
-              <DownloadOptions show={showDownloadOptions} />
+              <FormatGraphOptions show={showFormatOption} />
             </div>
             <div
-              onClick={() => setShowDownloadOptions(!showDownloadOptions)}
-              className={`${play ? "cursor-default text-gray-400" : "hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"} ${showDownloadOptions ? "text-[var(--secondary-color)]" : ""}`}
+              onClick={() => setShowFormatOption(!showFormatOption)}
+              className={`${play ? "cursor-default text-gray-400" : "hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"} ${showFormatOption ? "text-[var(--secondary-color)]" : ""}`}
             >
               <Tooltip
-                title={`${showDownloadOptions ? "Ẩn" : "Hiện"} tùy chọn điều chỉnh đồ thị`}
+                title={`${showFormatOption ? "Ẩn" : "Hiện"} tùy chỉnh đồ thị`}
                 placement="top"
               >
                 <BiNetworkChart />
@@ -312,10 +316,23 @@ const ControllBar = () => {
               <MdAutoGraph />
             </Tooltip>
           </div>
-          <div>
-            <Tooltip title="Hiện tùy chọn tải xuống" placement="top">
-              <RiFileDownloadLine />
-            </Tooltip>
+
+          <div className="relative hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300">
+            <div className="absolute bottom-[calc(100%+15px)] right-0 z-[100] bg-red-400">
+              <DownloadGraph show={showDownloadOption} />
+            </div>
+
+            <div
+              onClick={() => setShowDownloadOption(!showDownloadOption)}
+              className={`${play ? "cursor-default text-gray-400" : "hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"} ${showDownloadOption ? "text-[var(--secondary-color)]" : ""}`}
+            >
+              <Tooltip
+                title={`${showDownloadOption ? "Ẩn" : "Hiện"} tùy chọn tải xuống`}
+                placement="top"
+              >
+                <RiFileDownloadLine />
+              </Tooltip>
+            </div>
           </div>
         </div>
       </div>

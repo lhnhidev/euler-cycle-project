@@ -1,4 +1,6 @@
+import { useGraphContext } from "@/context/GraphContext";
 import { ColorPicker, Slider } from "antd";
+import { useEffect } from "react";
 import { FaCircleNodes } from "react-icons/fa6";
 import { IoColorPaletteOutline } from "react-icons/io5";
 import { TbVectorSpline } from "react-icons/tb";
@@ -7,7 +9,32 @@ type Props = {
   show: boolean;
 };
 
-const DownloadOptions = ({ show }: Props) => {
+const FormatGraphOption = ({ show }: Props) => {
+  const {
+    bgNodeColor,
+    labelColor,
+    nodeSize,
+    edgeLength,
+    edgeColor,
+    setNodeSize,
+    setEdgeLength,
+    setEdgeColor,
+    setBgNodeColor,
+    setLabelColor,
+    setTargetArrowColor,
+    graph,
+  } = useGraphContext();
+
+  useEffect(() => {
+    graph.current?.formatGraph(
+      bgNodeColor,
+      labelColor,
+      edgeColor,
+      edgeColor,
+      nodeSize,
+    );
+  }, [bgNodeColor, labelColor, edgeColor, nodeSize, graph]);
+
   return (
     <div
       className={`set-text-font-size-smaller cursor-default rounded-sm bg-[var(--bg-color)] px-4 py-2 text-[var(--text-color)] shadow-sm ${show ? "" : "hidden"}`}
@@ -20,8 +47,9 @@ const DownloadOptions = ({ show }: Props) => {
           </div>
           <div className="w-[90px]">
             <Slider
-              defaultValue={30}
+              value={nodeSize}
               max={100}
+              onChange={(value) => setNodeSize(value)}
               className="my-0"
               railStyle={{ backgroundColor: "#bbb" }}
             />
@@ -34,8 +62,9 @@ const DownloadOptions = ({ show }: Props) => {
           </div>
           <div className="w-[90px]">
             <Slider
-              defaultValue={30}
+              value={edgeLength}
               max={100}
+              onChange={(value) => setEdgeLength(value)}
               className="my-0"
               railStyle={{ backgroundColor: "#bbb" }}
             />
@@ -48,7 +77,17 @@ const DownloadOptions = ({ show }: Props) => {
             <p>Màu nền nút: </p>
           </div>
           <div className="w-[90px]">
-            <ColorPicker defaultValue="#1677ff" size="small" showText />
+            <ColorPicker
+              value={bgNodeColor}
+              size="small"
+              showText
+              onChange={(value) =>
+                setBgNodeColor(
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  (value as any)?.toHexString?.() ?? String(value),
+                )
+              }
+            />
           </div>
         </div>
 
@@ -58,7 +97,21 @@ const DownloadOptions = ({ show }: Props) => {
             <p>Màu cung: </p>
           </div>
           <div className="w-[90px]">
-            <ColorPicker defaultValue="#1677ff" size="small" showText />
+            <ColorPicker
+              value={edgeColor}
+              size="small"
+              showText
+              onChange={(value) => {
+                setEdgeColor(
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  (value as any)?.toHexString?.() ?? String(value),
+                );
+                setTargetArrowColor(
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  (value as any)?.toHexString?.() ?? String(value),
+                );
+              }}
+            />
           </div>
         </div>
 
@@ -68,11 +121,21 @@ const DownloadOptions = ({ show }: Props) => {
             <p>Màu nhãn: </p>
           </div>
           <div className="w-[90px]">
-            <ColorPicker defaultValue="#1677ff" size="small" showText />
+            <ColorPicker
+              value={labelColor}
+              size="small"
+              showText
+              onChange={(value) =>
+                setLabelColor(
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  (value as any)?.toHexString?.() ?? String(value),
+                )
+              }
+            />
           </div>
         </div>
       </div>
     </div>
   );
 };
-export default DownloadOptions;
+export default FormatGraphOption;
