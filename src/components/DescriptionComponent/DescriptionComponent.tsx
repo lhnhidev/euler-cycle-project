@@ -5,7 +5,6 @@ import TitleComponent from "../TitleComponent";
 import DescriptionTool from "../DescriptionTool";
 import { useGraphContext } from "@/context/GraphContext";
 import { useAppContext } from "@/context/AppContext";
-import "./Description Component.css";
 
 type TableType = {
   key: string;
@@ -44,14 +43,14 @@ const columns: TableColumnsType<TableType> = [
 ];
 
 const DescriptionComponent = () => {
-  const { isDirected, graph } = useGraphContext();
+  const { isDirected, graph, info } = useGraphContext();
   const { render, nodeStart } = useAppContext();
 
   const [data, setData] = useState<TableType[]>([]);
 
   useEffect(() => {
-    const result = graph.current.buildEulerCycle(nodeStart.id);
-    console.log(result.tableSteps);
+    const result = info;
+    console.log(result);
 
     const formattedData = result.tableSteps.map((step, index) => {
       return {
@@ -69,7 +68,7 @@ const DescriptionComponent = () => {
     });
 
     setData(formattedData);
-  }, [graph, render, isDirected, nodeStart.id]);
+  }, [graph, render, isDirected, nodeStart.id, info]);
 
   return (
     <div className="flex h-full flex-col overflow-hidden">

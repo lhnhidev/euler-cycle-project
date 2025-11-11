@@ -1,4 +1,4 @@
-import Graph from "@/libs/Graph";
+import Graph, { type DetailSteps, type TableSteps } from "@/libs/Graph";
 import { GraphContext } from "./GraphContext";
 import { useRef, useState, type ReactNode } from "react";
 import {
@@ -19,6 +19,20 @@ const GraphProvider = ({ children }: { children: ReactNode }) => {
     COLOR_TARGET_ARROW_EDGE,
   );
   const [labelColor, setLabelColor] = useState<string>(COLOR_NODE);
+  const [info, setInfo] = useState<{
+    steps: number;
+    detailSteps: DetailSteps[];
+    tableSteps: TableSteps[];
+    circuit: {
+      id: string;
+      label: string;
+    }[];
+  }>({
+    steps: 0,
+    detailSteps: [],
+    tableSteps: [],
+    circuit: [],
+  });
 
   const graph = useRef(new Graph());
 
@@ -42,6 +56,8 @@ const GraphProvider = ({ children }: { children: ReactNode }) => {
         setTargetArrowColor,
         labelColor,
         setLabelColor,
+        info,
+        setInfo,
       }}
     >
       {children}

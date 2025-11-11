@@ -15,13 +15,19 @@ import { BiNetworkChart } from "react-icons/bi";
 import { useAppContext } from "@/context/AppContext";
 import { useNotificationWithIcon } from "@/services/notify";
 import { createRunner } from "@/animation/playAlgorithm";
-import type { DetailSteps, TableSteps } from "@/libs/Graph";
 import DownloadGraph from "./DownloadGraph";
 
 const ControllBar = () => {
   const { graph } = useGraphContext();
-  const { nodeStart, setNodeStart, setLinesToHighlight, play, setPlay } =
-    useAppContext();
+  const {
+    nodeStart,
+    setNodeStart,
+    setLinesToHighlight,
+    play,
+    setPlay,
+    render,
+  } = useAppContext();
+  const { info, setInfo, isDirected } = useGraphContext();
 
   // const [play, setPlay] = useState<boolean>(false);
   const [speak, setSpeak] = useState<boolean>(false);
@@ -38,21 +44,6 @@ const ControllBar = () => {
   };
 
   const openNotificationWithIcon = useNotificationWithIcon();
-
-  const [info, setInfo] = useState<{
-    steps: number;
-    detailSteps: DetailSteps[];
-    tableSteps: TableSteps[];
-    circuit: {
-      id: string;
-      label: string;
-    }[];
-  }>({
-    steps: 0,
-    detailSteps: [],
-    tableSteps: [],
-    circuit: [],
-  });
 
   const runnerRef = useRef<ReturnType<typeof createRunner> | null>(null);
 
@@ -77,10 +68,6 @@ const ControllBar = () => {
   }, [graph.current, info.detailSteps]);
 
   useEffect(() => {
-    console.log(info.tableSteps);
-  }, [info.tableSteps]);
-
-  useEffect(() => {
     const runner = runnerRef.current;
     if (!runner) return;
 
@@ -97,7 +84,7 @@ const ControllBar = () => {
     setInfo(graph.current?.buildEulerCycle(nodeStart.id));
     setMaxSliderValue(info.steps);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodeStart.id]);
+  }, [nodeStart.id, graph, render, isDirected]);
 
   const handlePlay = (run: boolean) => {
     if (!nodeStart.id && !nodeStart.label) {

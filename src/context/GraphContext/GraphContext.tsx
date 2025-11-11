@@ -1,3 +1,4 @@
+import type { DetailSteps, TableSteps } from "@/libs/Graph";
 import type Graph from "@/libs/Graph";
 import { createContext } from "react";
 
@@ -19,6 +20,26 @@ export interface GraphContextType {
   setLabelColor: React.Dispatch<React.SetStateAction<string>>;
   targetArrowColor: string;
   setTargetArrowColor: React.Dispatch<React.SetStateAction<string>>;
+  info: {
+    steps: number;
+    detailSteps: DetailSteps[];
+    tableSteps: TableSteps[];
+    circuit: {
+      id: string;
+      label: string;
+    }[];
+  };
+  setInfo: React.Dispatch<
+    React.SetStateAction<{
+      steps: number;
+      detailSteps: DetailSteps[];
+      tableSteps: TableSteps[];
+      circuit: {
+        id: string;
+        label: string;
+      }[];
+    }>
+  >;
 }
 
 export const GraphContext = createContext<GraphContextType | undefined>(
