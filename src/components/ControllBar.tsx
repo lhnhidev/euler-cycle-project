@@ -15,7 +15,7 @@ import { BiNetworkChart } from "react-icons/bi";
 import { useAppContext } from "@/context/AppContext";
 import { useNotificationWithIcon } from "@/services/notify";
 import { createRunner } from "@/animation/playAlgorithm";
-import type { DetailSteps } from "@/libs/Graph";
+import type { DetailSteps, TableSteps } from "@/libs/Graph";
 import DownloadGraph from "./DownloadGraph";
 
 const ControllBar = () => {
@@ -42,6 +42,7 @@ const ControllBar = () => {
   const [info, setInfo] = useState<{
     steps: number;
     detailSteps: DetailSteps[];
+    tableSteps: TableSteps[];
     circuit: {
       id: string;
       label: string;
@@ -49,14 +50,9 @@ const ControllBar = () => {
   }>({
     steps: 0,
     detailSteps: [],
+    tableSteps: [],
     circuit: [],
   });
-
-  // useEffect(() => {
-  //   setInfo(graph.current?.buildEulerCycle(nodeStart.id));
-  //   setMaxSliderValue(info.steps);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [nodeStart.id]);
 
   const runnerRef = useRef<ReturnType<typeof createRunner> | null>(null);
 
@@ -79,6 +75,10 @@ const ControllBar = () => {
     setMaxSliderValue(info.detailSteps.length);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [graph.current, info.detailSteps]);
+
+  useEffect(() => {
+    console.log(info.tableSteps);
+  }, [info.tableSteps]);
 
   useEffect(() => {
     const runner = runnerRef.current;
@@ -127,11 +127,33 @@ const ControllBar = () => {
 
   const handleNext = () => {
     if (play) return;
+
+    if (nodeStart.id === "") {
+      openNotificationWithIcon(
+        "error",
+        "Chưa chọn đỉnh bắt đầu",
+        "Vui lòng chọn một đỉnh bắt đầu để tiếp tục",
+        "bottomRight",
+      );
+      return;
+    }
+
     runnerRef.current?.next();
   };
 
   const handlePrev = () => {
     if (play) return;
+
+    if (nodeStart.id === "") {
+      openNotificationWithIcon(
+        "error",
+        "Chưa chọn đỉnh bắt đầu",
+        "Vui lòng chọn một đỉnh bắt đầu để tiếp tục",
+        "bottomRight",
+      );
+      return;
+    }
+
     runnerRef.current?.prev();
   };
 

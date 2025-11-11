@@ -35,6 +35,8 @@ export type DetailSteps = {
     targetId: string;
     color: string;
   }[];
+  row: number | null;
+  col: number | null;
 };
 
 type GraphCopy = {
@@ -43,6 +45,17 @@ type GraphCopy = {
   nodes: { id: string; label: string }[];
   edges: { id: string; source: string; target: string }[];
   adj: { [key: string]: MySet<string> };
+};
+
+export type TableSteps = {
+  row: number;
+  currentNode: string;
+  edgeMoved: {
+    source: string;
+    target: string;
+  } | null;
+  stack: string[];
+  tempCircuit: string[];
 };
 
 export default class Graph {
@@ -1018,6 +1031,7 @@ export default class Graph {
   buildEulerCycle(startId: string): {
     steps: number;
     detailSteps: DetailSteps[];
+    tableSteps: TableSteps[];
     circuit: { id: string; label: string }[];
   } {
     this.init();
@@ -1027,6 +1041,7 @@ export default class Graph {
       return {
         steps: 0,
         detailSteps: [],
+        tableSteps: [],
         circuit: [],
       };
     }
@@ -1089,6 +1104,8 @@ export default class Graph {
           targetId: e.targetId,
           color: e.color,
         })),
+        row: detailSteps[detailSteps.length - 1].row || null,
+        col: detailSteps[detailSteps.length - 1].col || null,
       });
     };
 
@@ -1100,6 +1117,8 @@ export default class Graph {
       bgColorNode: string[],
       colorNode: string[],
       colorEdge: string[],
+      // row: number | null = null,
+      // col: number | null = null,
     ) => {
       idNodes.forEach((id, idx) => {
         detailSteps[step - 1].nodes.forEach((node) => {
@@ -1117,6 +1136,9 @@ export default class Graph {
           }
         });
       });
+
+      // detailSteps[step - 1].row = row;
+      // detailSteps[step - 1].col = col;
     };
 
     if (!this.isEulerGraph()) {
@@ -1127,20 +1149,40 @@ export default class Graph {
           colorLine: step === 3 ? 19 : step,
           nodes: resetNodeGraph(),
           edges: resetEdgeGraph(),
+          row: null,
+          col: null,
         })),
+        tableSteps: [],
         circuit: [],
       };
     }
 
-    // Những dòng sẽ chắc chắn tô màu
+    const getLabel = (id: string) =>
+      this.nodes.find((node) => node.id === id)?.label || "";
+
+    // !NOTE: Những dòng sẽ chắc chắn tô màu
     const colorLineInit = [1, 2, 4, 5, 6, 8];
     const detailSteps: DetailSteps[] = [];
+    const tableSteps: TableSteps[] = [];
+
+    // TODO: Xây dựng dòng 1 của tableSteps
+    // tableSteps không cần nằm trong vòng lặp for 1 -> 6
+    tableSteps.push({
+      row: 1,
+      currentNode: getLabel(startId),
+      edgeMoved: null,
+      stack: [getLabel(startId)],
+      tempCircuit: [],
+    });
+
     for (let i = 1; i <= 6; i++) {
       detailSteps.push({
         step: i,
         colorLine: colorLineInit[i - 1],
         nodes: resetNodeGraph(),
         edges: resetEdgeGraph(),
+        row: i === 3 || i === 4 || i === 5 ? 2 : null,
+        col: i === 3 ? 2 : i === 4 ? 4 : i === 5 ? 5 : null,
       });
 
       switch (i) {
@@ -1173,10 +1215,6 @@ export default class Graph {
 
     const circuit: { id: string; label: string }[] = [];
 
-    let i = 6;
-    // console.log("trước khi bắt đầu white", detailSteps);
-    // throw new Error("Debugging");
-
     const getEdgeId = (u: string, v: string): string | null => {
       for (const edge of graphCopy.edges) {
         if (this.edgeVisited[edge.id] === false) {
@@ -1189,8 +1227,21 @@ export default class Graph {
       return null;
     };
 
+    let rowTable = 2;
+    let i = 6;
     while (!stack.isEmpty()) {
       // lấy đỉnh u trong stacck ra duyệt
+      const u = stack.top()!;
+
+      // TODO: Xây dựng tableSteps
+      tableSteps.push({
+        row: rowTable,
+        currentNode: getLabel(u),
+        edgeMoved: null,
+        stack: [],
+        tempCircuit: [...tableSteps[tableSteps.length - 1].tempCircuit],
+      });
+
       copyPrevNodesAndEdges(detailSteps, ++i, 9);
       buildNextStep(
         detailSteps,
@@ -1201,12 +1252,11 @@ export default class Graph {
         [COLOR_NODE],
         [],
       );
-      // console.log(detailSteps);
-      // throw new Error("Debugging");
+      detailSteps[detailSteps.length - 1].row = rowTable;
+      detailSteps[detailSteps.length - 1].col = 2;
 
       copyPrevNodesAndEdges(detailSteps, ++i, 11);
       buildNextStep(detailSteps, i, [], [], [], [], []);
-      const u = stack.top()!;
 
       if (graphCopy.adj[u].size() > 0) {
         // v là đỉnh kề, lấy cạnh kề {u, v} và css
@@ -1222,8 +1272,17 @@ export default class Graph {
           [],
           [COLOR_EDGE_CHOOSED],
         );
-        // console.log(detailSteps);
-        // throw new Error("Debugging");
+
+        // !NOTE: Cần kiểm tra u và v là id hay label
+        // => u và v là id
+        console.log(u, v);
+
+        tableSteps[tableSteps.length - 1].edgeMoved = {
+          source: getLabel(u),
+          target: getLabel(v),
+        };
+        detailSteps[detailSteps.length - 1].row = rowTable;
+        detailSteps[detailSteps.length - 1].col = 3;
 
         // đánh dấu cạnh {u, v} đã đi qua
         this.edgeVisited[edge!] = true;
@@ -1250,6 +1309,12 @@ export default class Graph {
           [COLOR_NODE_STACKED],
           [],
         );
+        // tableSteps[tableSteps.length - 1].edgeMoved = {};
+        tableSteps[tableSteps.length - 1].stack = stack
+          .values()
+          .map((id) => getLabel(id));
+        detailSteps[detailSteps.length - 1].row = rowTable;
+        detailSteps[detailSteps.length - 1].col = 4;
 
         if (graphCopy.isDirected) {
           graphCopy.adj[u].delete(v);
@@ -1274,12 +1339,17 @@ export default class Graph {
           [COLOR_NODE_DELETED_STATE],
           [],
         );
+        tableSteps[tableSteps.length - 1].stack = stack
+          .values()
+          .map((id) => getLabel(id));
+        detailSteps[detailSteps.length - 1].row = rowTable;
+        detailSteps[detailSteps.length - 1].col = 4;
 
         // Thêm đỉnh u vào chu trình
         copyPrevNodesAndEdges(detailSteps, ++i, 17);
         circuit.push({
           id: u,
-          label: this.nodes.find((node) => node.id === u)?.label || "",
+          label: getLabel(u),
         });
         buildNextStep(
           detailSteps,
@@ -1290,10 +1360,12 @@ export default class Graph {
           [COLOR_NODE_CYCLED],
           [],
         );
+        tableSteps[tableSteps.length - 1].tempCircuit.push(getLabel(u));
+        detailSteps[detailSteps.length - 1].row = rowTable;
+        detailSteps[detailSteps.length - 1].col = 5;
       }
 
-      // console.log("sau khi white 1 lần", detailSteps);
-      // throw new Error("Debugging");
+      ++rowTable;
 
       // Kết thúc vòng lặp while
       if (stack.isEmpty()) {
@@ -1301,13 +1373,13 @@ export default class Graph {
         buildNextStep(detailSteps, ++i, [], [], [], [], []);
       }
     }
-    console.log("Hoàn thành xây dựng chu trình Euler.");
+    // console.log("Hoàn thành xây dựng chu trình Euler.");
     copyPrevNodesAndEdges(detailSteps, ++i, 19);
-    console.log("detailSteps:", detailSteps);
 
     return {
       steps: detailSteps.length,
       detailSteps,
+      tableSteps,
       circuit: circuit.reverse(),
     };
   }

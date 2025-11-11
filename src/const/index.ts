@@ -5,49 +5,49 @@ export const LANGUAGE_OPTIONS = [
     value: "cpp",
     label: "C++",
     pesudoCode(nodeStart: { id: string; label: string }) {
-      return `BEGIN
-  IF graph infeasible THEN END
+      return `{
+  if (!isEulerianGraph()) return;
 
-  select start node: start ← node ${nodeStart.label || "?"}
-  init stack ← [start]
-  init tour ← []
+  Node startNode = ${nodeStart.label || "?"};
+  stack<Node> st; st.push(startNode);
+  vector<Node> tour;
 
-  WHILE (stack is not empty) DO
-    current ← top of stack
+  while (!st.empty()) {
+    Node current = st.top();
 
-    IF (current has unvisited edge) THEN
-      {current, u} ← take unvisited edge
-      mark edge {current, u} as visited
-      push u onto stack
-    ELSE
-      pop stack
-      append current to tour: tour ← tour ∪ {current}
-  END WHILE
-END`;
+    if (current.hasUnvisitedEdge()) {
+      Edge e = current.getUnvisitedEdge();
+      markEdgeAsVisited(e);
+      Node u = e.getOtherNode(current); st.push(u);
+    } else {
+      st.pop();
+      tour.push_back(current); }
+  }
+}`;
     },
   },
   {
     value: "vn",
     label: "Tiếng Việt",
-    pesudoCode: (nodeStart: { id: string; label: string }) => `BEGIN
-  IF đồ_thị_không_thoả_điều_kiện_Euler THEN END
+    pesudoCode: (nodeStart: { id: string; label: string }) => `BẮT ĐẦU
+  NẾU (KHÔNG THỎA ĐIỀU KIỆN EULER) THÌ KẾT THÚC
 
-  chọn đỉnh bắt đầu: start ← node ${nodeStart.label || "?"}
-  khởi tạo stack ← [start]
-  khởi tạo tour ← []
+  ĐỈNH BẮT ĐẦU: BĐ ← Đỉnh ${nodeStart.label || "?"}
+  KHỞI TẠO STACK ← [BĐ]
+  KHỞI TẠO TOUR ← []
 
-  WHILE (stack không rỗng) DO
-    current ← đỉnh trên cùng của stack
+  TRONG KHI (STACK KHÔNG RỖNG) THÌ
+    CURRENT ← ĐỈNH TRÊN CÙNG CỦA STACK
 
-    IF (current có cạnh chưa được thăm) THEN
-      {current, u} ← lấy cạnh chưa được thăm
-      đánh dấu cạnh {current, u} là đã thăm
-      đẩy u vào stack
-    ELSE
-      pop stack
-      thêm current vào tour: tour ← tour ∪ {current}
-  END WHILE
-END`,
+    NẾU (CURRENT CÓ CẠNH CHƯA ĐƯỢC THĂM) THÌ
+      {CURRENT, U} ← LẤY CẠNH CHƯA ĐƯỢC THĂM
+      ĐÁNH DẤU CẠNH {CURRENT, U} LÀ ĐÃ THĂM
+      ĐẨY U VÀO STACK
+    KHÔNG THÌ
+      POP STACK
+      THÊM CURRENT VÀO TOUR: TOUR ← TOUR ∪ {CURRENT}
+  KẾT THÚC
+KẾT THÚC`,
   },
   {
     value: "en",

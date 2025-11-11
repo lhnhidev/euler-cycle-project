@@ -1,3 +1,4 @@
+import { useAppContext } from "@/context/AppContext";
 import WindowNav from "./WindowNav";
 import WindowTitle from "./WindowTitle";
 import { useGraphContext } from "@/context/GraphContext";
@@ -5,10 +6,15 @@ import { useGraphContext } from "@/context/GraphContext";
 
 const Window = () => {
   const { graph } = useGraphContext();
+  const { nodeStart } = useAppContext();
   // const { setLinesToHighlight } = useAppContext();
   const handleSubmit = () => {
-    const res = graph.current.buildEulerCycle("0");
-    console.log(res);
+    console.log(
+      "Thực hiện thuật toán với nút: ",
+      nodeStart.id,
+      nodeStart.label,
+    );
+    console.log(graph.current.buildEulerCycle(nodeStart.id));
   };
 
   return (

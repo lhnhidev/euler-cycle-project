@@ -1,22 +1,22 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Table } from "antd";
 import type { TableColumnsType } from "antd";
 import TitleComponent from "../TitleComponent";
 import DescriptionTool from "../DescriptionTool";
+import { useGraphContext } from "@/context/GraphContext";
+import { useAppContext } from "@/context/AppContext";
+import "./Description Component.css";
 
-interface DataType {
-  key: React.Key;
-  name?: string;
-  age?: number;
-  address?: string;
-  step?: string;
-  currentPosition?: string;
-  edge?: string;
-  temporaryCycle?: string;
-  note?: string;
-}
+type TableType = {
+  key: string;
+  step: string;
+  currentPosition: string;
+  edge: string;
+  temporaryCycle: string;
+  stack: string;
+};
 
-const columns: TableColumnsType<DataType> = [
+const columns: TableColumnsType<TableType> = [
   {
     title: "Bước",
     width: 60,
@@ -33,84 +33,44 @@ const columns: TableColumnsType<DataType> = [
     dataIndex: "edge",
   },
   {
+    title: "Ngăn xếp",
+    width: 180,
+    dataIndex: "stack",
+  },
+  {
     title: "Chu trình tạm thời",
-    width: 250,
     dataIndex: "temporaryCycle",
-  },
-  {
-    title: "Ghi chú",
-    dataIndex: "note",
-  },
-];
-
-const data: DataType[] = [
-  {
-    key: "1",
-    step: "1",
-    currentPosition: "A",
-    edge: "A -> B",
-    temporaryCycle: "A → B",
-    note: "đi sang B",
-  },
-  {
-    key: "2",
-    step: "2",
-    currentPosition: "B",
-    edge: "B -> C",
-    temporaryCycle: "A → B → C",
-    note: "đi sang C",
-  },
-  {
-    key: "3",
-    step: "3",
-    currentPosition: "C",
-    edge: "C -> D",
-    temporaryCycle: "A → B → C → D",
-    note: "đi sang D",
-  },
-  {
-    key: "4",
-    step: "4",
-    currentPosition: "D",
-    edge: "D -> A",
-    temporaryCycle: "A → B → C → D → A",
-    note: "quay lại A (hoàn thành 1 vòng)",
-  },
-  {
-    key: "5",
-    step: "5",
-    currentPosition: "A",
-    edge: "A -> C",
-    temporaryCycle: "A → B → C → D → A → C",
-    note: "phát hiện còn cạnh A–C",
-  },
-  {
-    key: "6",
-    step: "6",
-    currentPosition: "C",
-    edge: "(đã đi hết)",
-    temporaryCycle: "A → B → C → D → A → C → B → A",
-    note: "khép kín chu trình",
-  },
-  {
-    key: "7",
-    step: "6",
-    currentPosition: "C",
-    edge: "(đã đi hết)",
-    temporaryCycle: "A → B → C → D → A → C → B → A",
-    note: "khép kín chu trình",
-  },
-  {
-    key: "8",
-    step: "6",
-    currentPosition: "C",
-    edge: "(đã đi hết)",
-    temporaryCycle: "A → B → C → D → A → C → B → A",
-    note: "khép kín chu trình",
   },
 ];
 
 const DescriptionComponent = () => {
+  const { isDirected, graph } = useGraphContext();
+  const { render, nodeStart } = useAppContext();
+
+  const [data, setData] = useState<TableType[]>([]);
+
+  useEffect(() => {
+    const result = graph.current.buildEulerCycle(nodeStart.id);
+    console.log(result.tableSteps);
+
+    const formattedData = result.tableSteps.map((step, index) => {
+      return {
+        key: (index + 1).toString(),
+        step: (index + 1).toString(),
+        currentPosition: step.currentNode,
+        edge: step.edgeMoved
+          ? `${step.edgeMoved.source} -> ${step.edgeMoved.target}`
+          : index === 0
+            ? ""
+            : "Đã đi hết",
+        temporaryCycle: step.tempCircuit.join(" -> "),
+        stack: step.stack.join(", "),
+      };
+    });
+
+    setData(formattedData);
+  }, [graph, render, isDirected, nodeStart.id]);
+
   return (
     <div className="flex h-full flex-col overflow-hidden">
       <div className="relative">
@@ -123,7 +83,7 @@ const DescriptionComponent = () => {
         />
       </div>
       <div className="my-2 flex-1 overflow-auto bg-[var(--bg-color)]">
-        <Table<DataType>
+        <Table<TableType>
           bordered={true}
           columns={columns}
           dataSource={data}
