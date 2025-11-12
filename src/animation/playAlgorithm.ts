@@ -15,10 +15,18 @@ const runAnimation = (
   step: number,
   setLinesToHighlight: (lines: number[]) => void,
   setSliderValue: (value: number) => void,
+  setHighlightedCell: (cell: {
+    row: number | null;
+    col: number | null;
+  }) => void,
 ) => {
   // Hàm này thực hiện hiển thị animation cho đồ thị
   setLinesToHighlight([detailSteps.colorLine]); // Tô màu mã giả
-  setSliderValue(step); // Cập nhật thanh trượt của controllbar
+  setSliderValue(step); // Cập nhật thanh trượt của controlbar
+  setHighlightedCell({
+    row: detailSteps.row ? detailSteps.row - 1 : null,
+    col: detailSteps.col ? detailSteps.col - 1 : null,
+  }); // Cập nhật ô được highlight trong bảng mô tả thuật toán
 
   const core = graph.getCore()!;
 
@@ -94,6 +102,10 @@ export function createRunner(
   getSpeed: () => number, // Hàm trả về tốc độ (delay) giữa các bước
   setSliderValue: (value: number) => void,
   setPlay: (play: boolean) => void,
+  setHighlightedCell: (cell: {
+    row: number | null;
+    col: number | null;
+  }) => void,
 ) {
   // Chỉ số bước hiện tại trong danh sách các bước chi tiết
   let index = 0;
@@ -122,6 +134,7 @@ export function createRunner(
         index,
         setLinesToHighlight,
         setSliderValue,
+        setHighlightedCell,
       );
 
       // Chuyển sang bước kế tiếp
@@ -157,6 +170,7 @@ export function createRunner(
         index,
         setLinesToHighlight,
         setSliderValue,
+        setHighlightedCell,
       );
     }
   };
@@ -173,6 +187,7 @@ export function createRunner(
         index,
         setLinesToHighlight,
         setSliderValue,
+        setHighlightedCell,
       );
     }
   };
@@ -189,6 +204,7 @@ export function createRunner(
         index,
         setLinesToHighlight,
         setSliderValue,
+        setHighlightedCell,
       );
     }
   };

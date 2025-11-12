@@ -1181,7 +1181,7 @@ export default class Graph {
         colorLine: colorLineInit[i - 1],
         nodes: resetNodeGraph(),
         edges: resetEdgeGraph(),
-        row: i === 3 || i === 4 || i === 5 ? 2 : null,
+        row: i === 3 || i === 4 || i === 5 ? 1 : null,
         col: i === 3 ? 2 : i === 4 ? 4 : i === 5 ? 5 : null,
       });
 
@@ -1375,6 +1375,8 @@ export default class Graph {
     }
     // console.log("Hoàn thành xây dựng chu trình Euler.");
     copyPrevNodesAndEdges(detailSteps, ++i, 19);
+
+    console.log(detailSteps);
 
     return {
       steps: detailSteps.length,

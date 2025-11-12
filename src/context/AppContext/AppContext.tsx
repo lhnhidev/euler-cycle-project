@@ -19,6 +19,10 @@ export interface AppContextType {
   >;
   play: boolean;
   setPlay: React.Dispatch<React.SetStateAction<boolean>>;
+  highlightedCell: { row: number | null; col: number | null };
+  setHighlightedCell: React.Dispatch<
+    React.SetStateAction<{ row: number | null; col: number | null }>
+  >;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);

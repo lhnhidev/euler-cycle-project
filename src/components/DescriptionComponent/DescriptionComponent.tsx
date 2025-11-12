@@ -5,6 +5,7 @@ import TitleComponent from "../TitleComponent";
 import DescriptionTool from "../DescriptionTool";
 import { useGraphContext } from "@/context/GraphContext";
 import { useAppContext } from "@/context/AppContext";
+import type { ColumnType } from "antd/es/table";
 
 type TableType = {
   key: string;
@@ -15,42 +16,65 @@ type TableType = {
   stack: string;
 };
 
-const columns: TableColumnsType<TableType> = [
-  {
-    title: "Bước",
-    width: 60,
-    dataIndex: "step",
-  },
-  {
-    title: "Vị trí hiện tại",
-    width: 100,
-    dataIndex: "currentPosition",
-  },
-  {
-    title: "Cạnh được đi",
-    width: 120,
-    dataIndex: "edge",
-  },
-  {
-    title: "Ngăn xếp",
-    width: 180,
-    dataIndex: "stack",
-  },
-  {
-    title: "Chu trình tạm thời",
-    dataIndex: "temporaryCycle",
-  },
-];
-
 const DescriptionComponent = () => {
   const { isDirected, graph, info } = useGraphContext();
-  const { render, nodeStart } = useAppContext();
+  const { render, nodeStart, highlightedCell } = useAppContext();
 
   const [data, setData] = useState<TableType[]>([]);
 
+  const getOnCellProps =
+    (columnIndex: number) =>
+    (_record: ColumnType<TableType>, rowIndex: number | undefined) => {
+      // So sánh rowIndex của hàng hiện tại với row trong state
+      // So sánh columnIndex (cột hiện tại) với column trong state
+      console.log(highlightedCell.row, highlightedCell.col);
+      if (
+        rowIndex === (highlightedCell.row ?? -999) &&
+        columnIndex === (highlightedCell.col ?? -999)
+      ) {
+        return {
+          style: {
+            backgroundColor: "var(--highlight-line-color)",
+          },
+        };
+      }
+      return {}; // Không tô màu cho các ô khác
+    };
+
+  const columns: TableColumnsType<TableType> = [
+    {
+      title: "Bước",
+      width: 60,
+      dataIndex: "step",
+      onCell: getOnCellProps(0),
+    },
+    {
+      title: "Vị trí hiện tại",
+      width: 100,
+      dataIndex: "currentPosition",
+      onCell: getOnCellProps(1),
+    },
+    {
+      title: "Cạnh được đi",
+      width: 120,
+      dataIndex: "edge",
+      onCell: getOnCellProps(2),
+    },
+    {
+      title: "Ngăn xếp",
+      width: 180,
+      dataIndex: "stack",
+      onCell: getOnCellProps(3),
+    },
+    {
+      title: "Chu trình tạm thời",
+      dataIndex: "temporaryCycle",
+      onCell: getOnCellProps(4),
+    },
+  ];
+
   useEffect(() => {
     const result = info;
-    console.log(result);
 
     const formattedData = result.tableSteps.map((step, index) => {
       return {
@@ -62,7 +86,9 @@ const DescriptionComponent = () => {
           : index === 0
             ? ""
             : "Đã đi hết",
-        temporaryCycle: step.tempCircuit.join(" -> "),
+        temporaryCycle: isDirected
+          ? step.tempCircuit.reverse().join(" -> ")
+          : step.tempCircuit.join(" -> "),
         stack: step.stack.join(", "),
       };
     });

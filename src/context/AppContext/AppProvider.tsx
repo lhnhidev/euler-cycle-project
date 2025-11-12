@@ -20,6 +20,14 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const [play, setPlay] = useState<boolean>(false);
 
+  const [highlightedCell, setHighlightedCell] = useState<{
+    row: number | null;
+    col: number | null;
+  }>({
+    row: null,
+    col: null,
+  });
+
   return (
     <AppContext.Provider
       value={{
@@ -37,6 +45,8 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
         setNodeStart,
         play,
         setPlay,
+        highlightedCell,
+        setHighlightedCell,
       }}
     >
       {children}

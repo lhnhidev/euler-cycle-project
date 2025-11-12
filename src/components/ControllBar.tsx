@@ -18,7 +18,7 @@ import { createRunner } from "@/animation/playAlgorithm";
 import DownloadGraph from "./DownloadGraph";
 
 const ControllBar = () => {
-  const { graph } = useGraphContext();
+  const { graph, info, setInfo, isDirected } = useGraphContext();
   const {
     nodeStart,
     setNodeStart,
@@ -26,8 +26,8 @@ const ControllBar = () => {
     play,
     setPlay,
     render,
+    setHighlightedCell,
   } = useAppContext();
-  const { info, setInfo, isDirected } = useGraphContext();
 
   // const [play, setPlay] = useState<boolean>(false);
   const [speak, setSpeak] = useState<boolean>(false);
@@ -61,6 +61,7 @@ const ControllBar = () => {
       () => 1500 / speedRef.current,
       setSliderValue,
       setPlay,
+      setHighlightedCell,
     );
 
     setMaxSliderValue(info.detailSteps.length);
