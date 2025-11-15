@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "module": "es2022", // Hoặc "ESNext", "NodeNext"
+    "esModuleInterop": true // Quan trọng để tương thích
+    // ...
+  }
+}

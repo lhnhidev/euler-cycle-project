@@ -1,3 +1,4 @@
+import type { Message } from "@/components/ChatComponent/ChatComponent";
 import { AppContext } from "./AppContext";
 import { useState, type ReactNode } from "react";
 
@@ -28,6 +29,15 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
     col: null,
   });
 
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: crypto.randomUUID(),
+      text: "Xin chào! Tôi có thể giúp gì cho bạn?",
+      sender: "bot",
+      timestamp: new Date().toLocaleTimeString(),
+    },
+  ]);
+
   return (
     <AppContext.Provider
       value={{
@@ -47,6 +57,8 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
         setPlay,
         highlightedCell,
         setHighlightedCell,
+        messages,
+        setMessages,
       }}
     >
       {children}

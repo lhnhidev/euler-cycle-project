@@ -1,3 +1,4 @@
+import type { Message } from "@/components/ChatComponent/ChatComponent";
 import { createContext } from "react";
 
 export interface AppContextType {
@@ -23,6 +24,8 @@ export interface AppContextType {
   setHighlightedCell: React.Dispatch<
     React.SetStateAction<{ row: number | null; col: number | null }>
   >;
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
