@@ -7,8 +7,15 @@ import {
   screen,
 } from "electron";
 import * as path from "path";
+import * as fs from "fs";
 
 let mainWindow: BrowserWindow | null = null;
+
+interface NodeItem {
+  id: string;
+  name: string;
+  children?: NodeItem[];
+}
 
 function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -19,7 +26,9 @@ function createWindow() {
     frame: false,
     titleBarStyle: "hidden",
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(__dirname, "../dist/preload.js"),
+      nodeIntegration: false,
+      contextIsolation: true,
     },
   });
 
@@ -57,6 +66,74 @@ app.on("window-all-closed", () => {
 
 app.on("activate", () => {
   if (mainWindow === null) createWindow();
+});
+
+function readDirRecursive(dirPath: string): NodeItem[] {
+  try {
+    const entries = fs.readdirSync(dirPath, { withFileTypes: true });
+    const children: NodeItem[] = [];
+
+    for (const entry of entries) {
+      if (entry.name.startsWith(".")) continue;
+
+      const fullPath = path.join(dirPath, entry.name);
+
+      const node: NodeItem = {
+        id: fullPath,
+        name: entry.name,
+      };
+
+      if (entry.isDirectory()) {
+        node.children = readDirRecursive(fullPath);
+      }
+
+      children.push(node);
+    }
+
+    return children;
+  } catch (e) {
+    console.error(`Không thể đọc thư mục ${dirPath}:`, e);
+    return [];
+  }
+}
+
+ipcMain.handle("fs:readDirectory", (event, dirPath: string) => {
+  if (!fs.existsSync(dirPath)) {
+    return { success: false, error: "Đường dẫn không tồn tại" };
+  }
+
+  const rootNode: NodeItem = {
+    id: dirPath,
+    name: path.basename(dirPath),
+    children: readDirRecursive(dirPath),
+  };
+
+  return { success: true, data: [rootNode] as NodeItem[] };
+});
+
+// Xử lý tạo thư mục
+ipcMain.handle("fs:createFolder", async (event, folderPath) => {
+  try {
+    // fs.mkdirSync là lệnh đồng bộ, đơn giản cho ví dụ
+    fs.mkdirSync(folderPath, { recursive: true });
+    return { success: true, path: folderPath };
+  } catch (error) {
+    console.error("Lỗi khi tạo thư mục:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    return { success: false, error: message };
+  }
+});
+
+// Xử lý tạo file
+ipcMain.handle("fs:createFile", async (event, filePath, content = "") => {
+  try {
+    fs.writeFileSync(filePath, content);
+    return { success: true, path: filePath };
+  } catch (error) {
+    console.error("Lỗi khi tạo file:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    return { success: false, error: message };
+  }
 });
 
 ipcMain.on("window-control", (_event, action: string) => {
