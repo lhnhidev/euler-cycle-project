@@ -7,7 +7,7 @@ import { useGraphContext } from "@/context/GraphContext";
 import { useAppContext } from "@/context/AppContext";
 import type { ColumnType } from "antd/es/table";
 
-type TableType = {
+export type TableType = {
   key: string;
   step: string;
   currentPosition: string;

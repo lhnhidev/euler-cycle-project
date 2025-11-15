@@ -1,5 +1,5 @@
 import { useGraphContext } from "@/context/GraphContext";
-import Title from "./TitleComponent";
+import Title from "../TitleComponent";
 import { useEffect, useState } from "react";
 import { useAppContext } from "@/context/AppContext";
 import ResultTable from "./ResultTable";
@@ -7,7 +7,14 @@ import { Tooltip } from "antd";
 import { IoInformationCircleOutline } from "react-icons/io5";
 
 const ResultComponent = () => {
-  const { isDirected, graph } = useGraphContext();
+  const {
+    isDirected,
+    graph,
+    isEulerian,
+    hasEulerPath,
+    setIsEulerian,
+    setHasEulerPath,
+  } = useGraphContext();
   const {
     isDetailedResultHidden,
     setIsDetailedResultHidden,
@@ -19,9 +26,6 @@ const ResultComponent = () => {
     graph.current.countComponents(),
   );
 
-  const [isEulerian, setIsEulerian] = useState<boolean | null>(null);
-  const [hasEulerPath, setHasEulerPath] = useState<boolean | null>(null);
-
   useEffect(() => {
     graph.current.setOnChange(() => forceRender((v) => v + 1));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -31,7 +35,17 @@ const ResultComponent = () => {
     setConnectedComponents(graph.current.countComponents());
     setIsEulerian(graph.current.isEulerGraph());
     setHasEulerPath(graph.current.hasEulerPath());
-  }, [graph, render, isDirected]);
+
+    console.log(isEulerian, hasEulerPath);
+  }, [
+    graph,
+    render,
+    isDirected,
+    setIsEulerian,
+    setHasEulerPath,
+    isEulerian,
+    hasEulerPath,
+  ]);
 
   // const handleCount = () => {
   //   console.log(graph.current);

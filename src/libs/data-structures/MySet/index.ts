@@ -1,4 +1,9 @@
 export default class MySet<T> {
+  clone(): MySet<T> {
+    const newSet = new MySet<T>(this.comparator);
+    newSet.items = [...this.items];
+    return newSet;
+  }
   private items: T[];
   private comparator: (a: T, b: T) => number;
 

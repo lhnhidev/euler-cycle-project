@@ -942,6 +942,104 @@ export default class Graph {
     }
   }
 
+  getConnectedComponents(): {
+    [key: string]: { componentId: string; labelNode: string };
+  } {
+    this.init();
+
+    const nodeComponentMap: {
+      [key: string]: { componentId: string; labelNode: string };
+    } = {};
+    const nodeIdToLabelMap = new Map<string, string>();
+    this.getNodes().forEach((node) =>
+      nodeIdToLabelMap.set(node.id, node.label),
+    );
+
+    let componentIndex = 0;
+
+    if (!this.isDirected) {
+      for (const node of this.getNodes()) {
+        if (!this.marked[node.id]) {
+          componentIndex++;
+          const componentName = `component-${componentIndex}`;
+          const st = new MyStack<string>();
+          st.push(node.id);
+
+          while (!st.isEmpty()) {
+            const u = st.top()!;
+            st.pop();
+
+            if (this.marked[u]) continue;
+            this.marked[u] = true;
+            nodeComponentMap[u] = {
+              componentId: componentName,
+              labelNode: nodeIdToLabelMap.get(u)!,
+            };
+
+            const neighbors: string[] = this.adj[u]?.values() || [];
+            for (let i = neighbors.length - 1; i >= 0; i--) {
+              const v = neighbors[i];
+              if (!this.marked[v]) {
+                st.push(v);
+              }
+            }
+          }
+        }
+      }
+    } else {
+      // Using Tarjan's algorithm for Strongly Connected Components
+      this.k = 1;
+      this.stScc.clear();
+      this.onStack = {};
+      this.sccCount = 0;
+
+      const findScc = (startId: string) => {
+        this.num[startId] = this.minNum[startId] = this.k;
+        this.k++;
+        this.stScc.push(startId);
+        this.onStack[startId] = true;
+
+        const neighbors: string[] = this.adj[startId]?.values() || [];
+        for (const endId of neighbors) {
+          if (this.num[endId] === -1) {
+            findScc(endId);
+            this.minNum[startId] = Math.min(
+              this.minNum[startId],
+              this.minNum[endId],
+            );
+          } else if (this.onStack[endId]) {
+            this.minNum[startId] = Math.min(
+              this.minNum[startId],
+              this.num[endId],
+            );
+          }
+        }
+
+        if (this.num[startId] === this.minNum[startId]) {
+          this.sccCount++;
+          const componentName = `component-${this.sccCount}`;
+          let w: string;
+          do {
+            w = this.stScc.pop()!;
+            this.onStack[w] = false;
+            nodeComponentMap[w] = {
+              componentId: componentName,
+              labelNode: nodeIdToLabelMap.get(w)!,
+            };
+          } while (w !== startId);
+        }
+      };
+
+      for (const node of this.getNodes()) {
+        if (this.num[node.id] === -1) {
+          findScc(node.id);
+        }
+      }
+    }
+
+    return nodeComponentMap;
+  }
+
   countComponents(): number {
     this.init(); // reset toàn bộ graph trước khi chạy
 
@@ -976,6 +1074,7 @@ export default class Graph {
     const components = this.countComponents();
 
     if (components > 1) return false;
+    if (components === 0) return false;
 
     for (const node of this.getNodes()) {
       if (this.isDirected) {
@@ -998,6 +1097,7 @@ export default class Graph {
 
     const components = this.countComponents();
     if (components > 1) return false;
+    if (components === 0) return false;
 
     if (!this.isDirected) {
       let countNodeHaveOddDegree = 0;
@@ -1027,6 +1127,9 @@ export default class Graph {
   }
 
   private edgeVisited: { [key: string]: boolean } = {};
+
+  getLabel = (id: string) =>
+    this.nodes.find((node) => node.id === id)?.label || "";
 
   buildEulerCycle(startId: string): {
     steps: number;
@@ -1384,5 +1487,71 @@ export default class Graph {
       tableSteps,
       circuit: circuit.reverse(),
     };
+  }
+
+  buildEulerPath(): { id: string; label: string }[] {
+    this.init();
+
+    if (!this.hasEulerPath()) {
+      console.log("Đồ thị không có đường đi Euler.");
+      return [];
+    }
+
+    const graphCopyAdj: { [key: string]: MySet<string> } = {};
+    for (const key in this.adj) {
+      graphCopyAdj[key] = this.adj[key].clone();
+    }
+
+    let startNodeId: string | undefined = this.getNodes()[0]?.id;
+
+    if (!this.isEulerGraph()) {
+      if (!this.isDirected) {
+        startNodeId = this.getNodes().find(
+          (node) => (this.degree[node.id] || 0) % 2 !== 0,
+        )?.id;
+      } else {
+        startNodeId = this.getNodes().find(
+          (node) =>
+            (this.degOut[node.id] || 0) - (this.degIn[node.id] || 0) === 1,
+        )?.id;
+      }
+    }
+
+    if (!startNodeId) {
+      // This case should ideally not be reached if hasEulerPath is true
+      // and the graph has nodes. It's a fallback.
+      if (this.getNodes().length > 0) {
+        startNodeId = this.getNodes()[0].id;
+      } else {
+        return []; // No nodes, no path
+      }
+    }
+
+    const stack = new MyStack<string>();
+    const path: string[] = [];
+
+    stack.push(startNodeId);
+
+    while (!stack.isEmpty()) {
+      const u = stack.top()!;
+
+      if (graphCopyAdj[u] && graphCopyAdj[u].size() > 0) {
+        const v = graphCopyAdj[u].values()[0];
+        stack.push(v);
+
+        // Remove edge from the copied adjacency list
+        graphCopyAdj[u].delete(v);
+        if (!this.isDirected) {
+          graphCopyAdj[v].delete(u);
+        }
+      } else {
+        path.push(stack.pop()!);
+      }
+    }
+
+    const getLabel = (id: string) =>
+      this.nodes.find((node) => node.id === id)?.label || "";
+
+    return path.reverse().map((id) => ({ id, label: getLabel(id) }));
   }
 }

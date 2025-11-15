@@ -3,7 +3,11 @@ import { useGraphContext } from "@/context/GraphContext";
 import { Table } from "antd";
 import { useEffect, useState } from "react";
 
-const ResultTable = () => {
+type Props = {
+  isDetailed?: boolean;
+};
+
+const ResultTable = ({ isDetailed = false }: Props) => {
   const { isDirected, graph } = useGraphContext();
   const { render } = useAppContext();
   const [dataSource, setDataSource] = useState<
@@ -13,6 +17,7 @@ const ResultTable = () => {
       degree?: number;
       inDegree?: number;
       outDegree?: number;
+      adjacentNode?: string;
     }[]
   >([]);
 
@@ -47,6 +52,14 @@ const ResultTable = () => {
     },
   ];
 
+  const adjacencyColumns = [
+    {
+      title: "Đỉnh liền kề",
+      dataIndex: "adjacentNode",
+      key: "adjacentNode",
+    },
+  ];
+
   useEffect(() => {
     const newDataSource: {
       key: number;
@@ -54,6 +67,7 @@ const ResultTable = () => {
       degree?: number;
       inDegree?: number;
       outDegree?: number;
+      adjacentNode?: string;
     }[] = [];
     if (isDirected) {
       // console.log("directed", graph.current.getDegIn());
@@ -69,6 +83,12 @@ const ResultTable = () => {
           node: node.data().label,
           inDegree: inDegList[nodeId] ?? 0,
           outDegree: outDegList[nodeId] ?? 0,
+          adjacentNode: graph.current
+            .getAdjacencyList()
+            // eslint-disable-next-line no-unexpected-multiline
+            [nodeId]?.values()
+            .map((adjId) => graph.current.getLabel(adjId))
+            .join(", "),
         });
       }
 
@@ -83,6 +103,12 @@ const ResultTable = () => {
           key: index++,
           node: node.data().label,
           degree: degList[nodeId],
+          adjacentNode: graph.current
+            .getAdjacencyList()
+            // eslint-disable-next-line no-unexpected-multiline
+            [nodeId]?.values()
+            .map((adjId) => graph.current.getLabel(adjId))
+            .join(", "),
         });
       }
 
@@ -94,9 +120,12 @@ const ResultTable = () => {
     <div>
       <Table
         dataSource={dataSource}
-        columns={
-          isDirected ? graphHasDirectedColumns : graphHasNotDirectedColumns
-        }
+        columns={[
+          ...(isDirected
+            ? graphHasDirectedColumns
+            : graphHasNotDirectedColumns),
+          ...(isDetailed ? adjacencyColumns : []),
+        ]}
         size="small"
         pagination={false}
         sticky

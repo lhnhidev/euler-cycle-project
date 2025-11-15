@@ -34,6 +34,9 @@ const GraphProvider = ({ children }: { children: ReactNode }) => {
     circuit: [],
   });
 
+  const [isEulerian, setIsEulerian] = useState<boolean | null>(null);
+  const [hasEulerPath, setHasEulerPath] = useState<boolean | null>(null);
+
   const graph = useRef(new Graph());
 
   return (
@@ -58,6 +61,10 @@ const GraphProvider = ({ children }: { children: ReactNode }) => {
         setLabelColor,
         info,
         setInfo,
+        isEulerian,
+        setIsEulerian,
+        hasEulerPath,
+        setHasEulerPath,
       }}
     >
       {children}

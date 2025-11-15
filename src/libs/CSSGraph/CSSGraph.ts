@@ -123,6 +123,22 @@ const CSSGraph = (
         width: `${4}`,
       },
     },
+    {
+      selector: ".parent-group",
+      style: {
+        "background-color": "#1783FF", // Màu nền nhạt
+        "background-opacity": 0.1,
+        "border-color": "#8888ff", // Màu viền
+        "border-width": 1,
+        shape: "round-rectangle", // Dùng hình chữ nhật bo tròn
+        label: "data(label)",
+        "text-valign": "top",
+        "text-halign": "center",
+        "font-size": "12px",
+        color: "#333",
+        padding: "10px",
+      },
+    },
   ];
 };
 export default CSSGraph;

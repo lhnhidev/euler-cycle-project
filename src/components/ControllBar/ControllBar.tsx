@@ -10,11 +10,11 @@ import { ImNext2, ImPrevious2 } from "react-icons/im";
 import { IoIosPause, IoIosPlay } from "react-icons/io";
 import { MdAutoGraph, MdOutlineLoop } from "react-icons/md";
 import { RiFileDownloadLine } from "react-icons/ri";
-import FormatGraphOptions from "./FormatGraphOptions";
 import { BiNetworkChart } from "react-icons/bi";
 import { useAppContext } from "@/context/AppContext";
 import { useNotificationWithIcon } from "@/services/notify";
 import { createRunner } from "@/animation/playAlgorithm";
+import FormatGraphOptions from "./FormatGraphOptions";
 import DownloadGraph from "./DownloadGraph";
 
 const ControllBar = () => {
