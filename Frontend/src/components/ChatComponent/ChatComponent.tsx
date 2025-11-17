@@ -9,6 +9,8 @@ import {
 } from "react";
 import { IoCloseOutline } from "react-icons/io5";
 import { LuSendHorizontal } from "react-icons/lu";
+import ReactMarkdown from "react-markdown";
+import "./index.css";
 
 export interface Message {
   id: string;
@@ -22,10 +24,17 @@ type Props = {
 };
 
 const ChatComponent = ({ setShowChatbot }: Props) => {
-  const { graph, isDirected } = useGraphContext();
+  const {
+    graph,
+    isDirected,
+    info,
+    connectedComponents,
+    isEulerian,
+    hasEulerPath,
+  } = useGraphContext();
 
   // State để lưu danh sách các tin nhắn
-  const { messages, setMessages } = useAppContext();
+  const { messages, setMessages, nodeStart } = useAppContext();
 
   // State để lưu nội dung tin nhắn đang nhập
   const [newMessage, setNewMessage] = useState<string>("");
@@ -43,11 +52,28 @@ const ChatComponent = ({ setShowChatbot }: Props) => {
     scrollToBottom();
   }, [messages, isLoading]);
 
+  // useEffect(() => {
+  //   const startChatSession = async () => {
+  //     const response = await fetch(import.meta.env.VITE_START_URL, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({}),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Network response was not ok");
+  //     }
+  //   };
+
+  //   startChatSession();
+  // }, []);
+
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setNewMessage(event.target.value);
   };
 
-  // Xử lý khi người dùng gửi tin nhắn
   const handleSendMessage = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (newMessage.trim() === "" || isLoading) return;
@@ -68,11 +94,10 @@ const ChatComponent = ({ setShowChatbot }: Props) => {
     // Xóa nội dung input
     setNewMessage("");
 
-    const YOUR_SERVER_URL = "http://localhost:3001/api/chat";
+    const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     try {
-      // Gọi đến MÁY CHỦ CỦA BẠN (proxy)
       console.log(graph.current.getNodes().length);
-      const response = await fetch(YOUR_SERVER_URL, {
+      const response = await fetch(SERVER_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -95,7 +120,20 @@ const ChatComponent = ({ setShowChatbot }: Props) => {
                   )
                   .join(", ")}.
 - Đồ thị này ${isDirected ? "có hướng" : "vô hướng"}.
-Hãy sử dụng dữ liệu này để trả lời các câu hỏi của người dùng một cách chính xác và chi tiết.`
+- Hãy sử dụng dữ liệu này để trả lời các câu hỏi của người dùng một cách chính xác và chi tiết.
+- Số thành phần liên thông ${isDirected ? "mạnh" : ""} trong đồ thị là ${connectedComponents}
+- Thuật toán được sử dụng để phân tích đồ thị này là Hierholzer’s Algorithm
+- Đỉnh bắt đầu được cài đặt trong giải thuật là ${nodeStart?.label ? nodeStart.label : "chưa có đỉnh bắt đầu"}
+- Đồ thị đã cho ${isEulerian ? "là" : "không phải là"} đồ thị Euler, ${
+                  isEulerian
+                    ? `chu trình Euler là: ${
+                        nodeStart.id
+                          ? info.circuit.map((node) => node.label).join(" -> ")
+                          : "Chưa chọn đỉnh bắt đầu nên chưa thể xác định được chu trình Euler"
+                      }`
+                    : "không có chu trình Euler hoặc chưa thể xác định chu trình Euler do chưa chọn đỉnh bắt đầu"
+                }
+- Đồ thị đã cho ${hasEulerPath ? "có đường đi Euler" : "không có đường đi Euler hoặc chưa thể xác định được do chưa chọn đỉnh bắt đầu"}`
           }`,
         }),
       });
@@ -107,8 +145,9 @@ Hãy sử dụng dữ liệu này để trả lời các câu hỏi của ngư�
       const data = await response.json();
 
       // Lấy câu trả lời của AI từ API
-      const botText =
-        data.choices[0]?.message?.content || "Sorry, I had an error.";
+      console.log(data.rely);
+
+      const botText = data.reply || "Sorry, I had an error.";
 
       const botMessage: Message = {
         id: crypto.randomUUID(),
@@ -145,7 +184,7 @@ Hãy sử dụng dữ liệu này để trả lời các câu hỏi của ngư�
         <IoCloseOutline />
       </div>
 
-      <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto bg-gray-50 p-2.5">
+      <div className="flex flex-1 flex-col gap-2.5 overflow-y-auto bg-gray-50 p-2.5 text-sm">
         {messages.map((msg) => (
           <div
             key={msg.id}
@@ -155,7 +194,9 @@ Hãy sử dụng dữ liệu này để trả lời các câu hỏi của ngư�
                 : "self-start bg-gray-200 text-black"
             }`}
           >
-            <div>{msg.text}</div>
+            <div className="space-y-3">
+              <ReactMarkdown>{msg.text}</ReactMarkdown>
+            </div>
             <div className="mt-1 text-xs text-gray-500">{msg.timestamp}</div>
           </div>
         ))}

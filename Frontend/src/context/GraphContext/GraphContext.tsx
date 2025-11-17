@@ -44,6 +44,8 @@ export interface GraphContextType {
   setIsEulerian: React.Dispatch<React.SetStateAction<boolean | null>>;
   hasEulerPath: boolean | null;
   setHasEulerPath: React.Dispatch<React.SetStateAction<boolean | null>>;
+  connectedComponents: number;
+  setConnectedComponents: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const GraphContext = createContext<GraphContextType | undefined>(

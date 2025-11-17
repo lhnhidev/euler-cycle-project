@@ -1,9 +1,9 @@
 {
   "dependencies": {
+    "@google/genai": "^1.29.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "groq-sdk": "^0.35.0",
     "node-fetch": "^2.7.0"
   },
   "devDependencies": {

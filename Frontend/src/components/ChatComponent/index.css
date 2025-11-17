@@ -1,0 +1,14 @@
+li {
+  list-style-type: disc;
+}
+
+ul li {
+  margin-bottom: 4px;
+  margin-left: 20px;
+}
+
+ol li {
+  list-style-type: decimal;
+  margin-bottom: 4px;
+  margin-left: 20px;
+}

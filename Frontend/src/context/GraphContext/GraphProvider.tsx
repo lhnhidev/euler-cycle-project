@@ -39,6 +39,10 @@ const GraphProvider = ({ children }: { children: ReactNode }) => {
 
   const graph = useRef(new Graph());
 
+  const [connectedComponents, setConnectedComponents] = useState<number>(
+    graph.current.countComponents(),
+  );
+
   return (
     <GraphContext.Provider
       value={{
@@ -65,6 +69,8 @@ const GraphProvider = ({ children }: { children: ReactNode }) => {
         setIsEulerian,
         hasEulerPath,
         setHasEulerPath,
+        connectedComponents,
+        setConnectedComponents,
       }}
     >
       {children}

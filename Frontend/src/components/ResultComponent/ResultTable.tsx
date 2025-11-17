@@ -69,50 +69,59 @@ const ResultTable = ({ isDetailed = false }: Props) => {
       outDegree?: number;
       adjacentNode?: string;
     }[] = [];
+
+    const nodes = graph.current.getCore()?.nodes();
+    if (!nodes) {
+      setDataSource([]);
+      return;
+    }
+
     if (isDirected) {
-      // console.log("directed", graph.current.getDegIn());
-      // console.log("directed", graph.current.getDegOut());
+      setTimeout(() => {
+        const inDegList = graph.current.getDegIn();
+        const outDegList = graph.current.getDegOut();
 
-      const inDegList = graph.current.getDegIn();
-      const outDegList = graph.current.getDegOut();
-      let index = 0;
-      for (const nodeId in inDegList) {
-        const node = graph.current.getCore()!.getElementById(nodeId);
-        newDataSource.push({
-          key: index++,
-          node: node.data().label,
-          inDegree: inDegList[nodeId] ?? 0,
-          outDegree: outDegList[nodeId] ?? 0,
-          adjacentNode: graph.current
-            .getAdjacencyList()
-            // eslint-disable-next-line no-unexpected-multiline
-            [nodeId]?.values()
-            .map((adjId) => graph.current.getLabel(adjId))
-            .join(", "),
+        nodes.forEach((node, index) => {
+          const nodeId = node.id();
+          newDataSource.push({
+            key: index,
+            node: node.data().label,
+            inDegree: inDegList[nodeId] ?? 0,
+            outDegree: outDegList[nodeId] ?? 0,
+            adjacentNode: graph.current
+              .getAdjacencyList()
+              // eslint-disable-next-line no-unexpected-multiline
+              [nodeId]?.values()
+              .map((adjId) => graph.current.getLabel(adjId))
+              .join(", "),
+          });
         });
-      }
 
-      setDataSource(newDataSource);
+        setDataSource(newDataSource);
+      }, 200);
     } else {
-      // console.log("not directed", graph.current.getDegree());
-      const degList = graph.current.getDegree();
-      let index = 0;
-      for (const nodeId in degList) {
-        const node = graph.current.getCore()!.getElementById(nodeId);
-        newDataSource.push({
-          key: index++,
-          node: node.data().label,
-          degree: degList[nodeId],
-          adjacentNode: graph.current
-            .getAdjacencyList()
-            // eslint-disable-next-line no-unexpected-multiline
-            [nodeId]?.values()
-            .map((adjId) => graph.current.getLabel(adjId))
-            .join(", "),
-        });
-      }
+      setTimeout(() => {
+        const degList = graph.current.getDegree();
 
-      setDataSource(newDataSource);
+        nodes.forEach((node, index) => {
+          const nodeId = node.id();
+          newDataSource.push({
+            key: index,
+            node: node.data()?.label || "",
+            degree: degList[nodeId] ?? 0,
+            adjacentNode: graph.current
+              .getAdjacencyList()
+              // eslint-disable-next-line no-unexpected-multiline
+              [nodeId]?.values()
+              .map((adjId) => graph.current.getLabel(adjId))
+              .join(", "),
+          });
+        });
+
+        console.log(newDataSource);
+
+        setDataSource(newDataSource);
+      }, 200);
     }
   }, [graph, render, isDirected]);
 

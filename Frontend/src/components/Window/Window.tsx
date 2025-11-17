@@ -9,12 +9,7 @@ const Window = () => {
   const { nodeStart } = useAppContext();
   // const { setLinesToHighlight } = useAppContext();
   const handleSubmit = () => {
-    console.log(
-      "Thực hiện thuật toán với nút: ",
-      nodeStart.id,
-      nodeStart.label,
-    );
-    console.log(graph.current.buildEulerCycle(nodeStart.id));
+    console.log(graph.current.buildEulerCycle(nodeStart.id).tableSteps);
   };
 
   return (

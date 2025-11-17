@@ -1,3 +1,4 @@
+/* eslint-disable no-unexpected-multiline */
 import cytoscape from "cytoscape";
 import CSSGraph from "./CSSGraph";
 import LayoutGraph from "./LayoutGraph";
@@ -56,6 +57,10 @@ export type TableSteps = {
   } | null;
   stack: string[];
   tempCircuit: string[];
+  stackPrevious: string[];
+  listEdge: { source: string; target: string; isMoved: boolean }[];
+  pushOrPopStack: "push" | "pop" | "none";
+  note: string[];
 };
 
 export default class Graph {
@@ -1073,6 +1078,9 @@ export default class Graph {
     this.init(); // reset toàn bộ graph trước khi chạy
     const components = this.countComponents();
 
+    const nodes = this.getNodes().length;
+    if (nodes === 0 || nodes === 1) return false;
+
     if (components > 1) return false;
     if (components === 0) return false;
 
@@ -1270,12 +1278,17 @@ export default class Graph {
 
     // TODO: Xây dựng dòng 1 của tableSteps
     // tableSteps không cần nằm trong vòng lặp for 1 -> 6
+    const label = getLabel(startId);
     tableSteps.push({
       row: 1,
-      currentNode: getLabel(startId),
+      currentNode: label,
       edgeMoved: null,
-      stack: [getLabel(startId)],
+      stack: [label],
       tempCircuit: [],
+      stackPrevious: [],
+      listEdge: [],
+      pushOrPopStack: "none",
+      note: [`Chọn đỉnh ${label} làm đỉnh bắt đầu.`, `Đưa ${label} vào stack.`],
     });
 
     for (let i = 1; i <= 6; i++) {
@@ -1336,13 +1349,26 @@ export default class Graph {
       // lấy đỉnh u trong stacck ra duyệt
       const u = stack.top()!;
 
+      const labelU = getLabel(u);
+
       // TODO: Xây dựng tableSteps
       tableSteps.push({
         row: rowTable,
-        currentNode: getLabel(u),
+        currentNode: labelU,
         edgeMoved: null,
         stack: [],
         tempCircuit: [...tableSteps[tableSteps.length - 1].tempCircuit],
+        stackPrevious: tableSteps[tableSteps.length - 1].stack,
+        listEdge:
+          this.getAdjacencyList()
+            [u]?.values()
+            ?.map((id) => ({
+              source: labelU,
+              target: getLabel(id),
+              isMoved: graphCopy.adj[u].has(id) ? false : true,
+            })) || [],
+        pushOrPopStack: "none",
+        note: [`Lấy đỉnh ${labelU} từ đỉnh trên cùng của stack để duyệt.`],
       });
 
       copyPrevNodesAndEdges(detailSteps, ++i, 9);
@@ -1376,14 +1402,17 @@ export default class Graph {
           [COLOR_EDGE_CHOOSED],
         );
 
-        // !NOTE: Cần kiểm tra u và v là id hay label
-        // => u và v là id
-        console.log(u, v);
+        const labelV = getLabel(v);
 
         tableSteps[tableSteps.length - 1].edgeMoved = {
-          source: getLabel(u),
-          target: getLabel(v),
+          source: labelU,
+          target: labelV,
         };
+        tableSteps[tableSteps.length - 1].note.push(
+          `Chọn cạnh (${labelU} - ${labelV}) để đi tiếp.`,
+          `Đánh dấu cạnh (${labelU} - ${labelV}) đã đi qua.`,
+          `Thêm đỉnh ${labelV} vào stack.`,
+        );
         detailSteps[detailSteps.length - 1].row = rowTable;
         detailSteps[detailSteps.length - 1].col = 3;
 
@@ -1426,6 +1455,12 @@ export default class Graph {
           graphCopy.adj[v].delete(u);
         }
       } else {
+        tableSteps[tableSteps.length - 1].note.push(
+          `Không còn cạnh này xuất phát từ ${labelU} mà chưa duyệt.`,
+          `Thêm đỉnh ${labelU} vào Chu trình`,
+          `Xóa đỉnh ${labelU} khỏi stack.`,
+        );
+        tableSteps[tableSteps.length - 1].pushOrPopStack = "pop";
         // Tô màu dòng else
         copyPrevNodesAndEdges(detailSteps, ++i, 15);
         buildNextStep(detailSteps, i, [], [], [], [], []);

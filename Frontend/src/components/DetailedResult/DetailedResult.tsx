@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import ResultTable from "../ResultComponent/ResultTable";
 import { Table, type TableColumnsType } from "antd";
 import type { TableType } from "../DescriptionComponent/DescriptionComponent";
+import { AiOutlinePlus, AiOutlineMinus } from "react-icons/ai";
 
 type Props = {
   isHidden: boolean;
@@ -201,6 +202,106 @@ const DetailedResult = ({ isHidden }: Props) => {
                       style={{
                         borderTopLeftRadius: 0,
                         borderTopRightRadius: 0,
+                      }}
+                      expandable={{
+                        expandedRowRender: (record) => (
+                          <>
+                            <div className="mb-3">
+                              <h4 className="font-semibold text-[var(--primary-color)]">
+                                Thông tin Bước {record.step}:
+                              </h4>
+                              <ul className="list-disc space-y-1 pl-5">
+                                <li>
+                                  Ngăn xếp ở bước trước: [{"  "}
+                                  {info.tableSteps[
+                                    Number(record.step) - 1
+                                  ].stackPrevious.join(", ")}
+                                  {"  "}]
+                                </li>
+                                {record.step !== "1" && (
+                                  <li>
+                                    Danh sách cạnh kề của đỉnh{" "}
+                                    {
+                                      info.tableSteps[Number(record.step) - 1]
+                                        .currentNode
+                                    }
+                                    :
+                                    <table className="mt-1 w-full table-auto border-collapse border border-slate-400">
+                                      <thead className="bg-gray-100">
+                                        <tr>
+                                          <th className="w-20 border border-slate-300 px-2 py-1 text-left">
+                                            Cạnh
+                                          </th>
+                                          <th className="w-36 border border-slate-300 px-2 py-1 text-left">
+                                            Trạng thái
+                                          </th>
+                                          <th className="border border-slate-300 px-2 py-1 text-left">
+                                            Kết luận
+                                          </th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {info.tableSteps[
+                                          Number(record.step) - 1
+                                        ].listEdge.map((edge, index) => (
+                                          <tr key={index}>
+                                            <td className="border border-slate-300 px-2 py-1">
+                                              {edge.source} - {edge.target}
+                                            </td>
+                                            <td className="border border-slate-300 px-2 py-1">
+                                              {edge.isMoved
+                                                ? "Đã duyệt"
+                                                : "Chưa duyệt"}
+                                            </td>
+                                            <td className="border border-slate-300 px-2 py-1">
+                                              Cạnh ({edge.source} -{" "}
+                                              {edge.target}){" "}
+                                              {edge.isMoved
+                                                ? "không đi được"
+                                                : "có thể đi"}
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </li>
+                                )}
+                              </ul>
+                            </div>
+
+                            <div className="mb-3">
+                              <h4 className="font-semibold text-[var(--primary-color)]">
+                                Chi tiết Bước {record.step}:
+                              </h4>
+
+                              <ol className="space-y-1 pl-5">
+                                {info.tableSteps[
+                                  Number(record.step) - 1
+                                ].note.map((note) => (
+                                  <li key={crypto.randomUUID()}>{note}</li>
+                                ))}
+                              </ol>
+                            </div>
+                          </>
+                        ),
+                        expandIcon: ({ expanded, onExpand, record }) =>
+                          expanded ? (
+                            <span
+                              onClick={(e) => onExpand(record, e)}
+                              style={{ cursor: "pointer" }}
+                              className="hover:text-[var(--primary-color)]"
+                            >
+                              <AiOutlineMinus />
+                            </span>
+                          ) : (
+                            <span
+                              onClick={(e) => onExpand(record, e)}
+                              style={{ cursor: "pointer" }}
+                              className="hover:text-[var(--primary-color)]"
+                            >
+                              <AiOutlinePlus />
+                            </span>
+                          ),
                       }}
                       className="[&_.ant-table-body]:!max-h-full [&_.ant-table-container]:!h-full [&_.ant-table-container]:!rounded-t-none [&_.ant-table-thead>tr>th:first-child]:!rounded-tl-none [&_.ant-table-thead>tr>th:last-child]:!rounded-tr-none [&_.ant-table]:!h-full"
                     />

@@ -1,6 +1,6 @@
 import { useGraphContext } from "@/context/GraphContext";
 import Title from "../TitleComponent";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAppContext } from "@/context/AppContext";
 import ResultTable from "./ResultTable";
 import { Tooltip } from "antd";
@@ -22,9 +22,7 @@ const ResultComponent = () => {
     forceRender,
   } = useAppContext();
 
-  const [connectedComponents, setConnectedComponents] = useState<number>(
-    graph.current.countComponents(),
-  );
+  const { connectedComponents, setConnectedComponents } = useGraphContext();
 
   useEffect(() => {
     graph.current.setOnChange(() => forceRender((v) => v + 1));
@@ -35,8 +33,6 @@ const ResultComponent = () => {
     setConnectedComponents(graph.current.countComponents());
     setIsEulerian(graph.current.isEulerGraph());
     setHasEulerPath(graph.current.hasEulerPath());
-
-    console.log(isEulerian, hasEulerPath);
   }, [
     graph,
     render,
@@ -45,6 +41,7 @@ const ResultComponent = () => {
     setHasEulerPath,
     isEulerian,
     hasEulerPath,
+    setConnectedComponents,
   ]);
 
   // const handleCount = () => {
