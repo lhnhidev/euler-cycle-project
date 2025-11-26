@@ -47,7 +47,6 @@ const CountComponentInGraph = () => {
       data: { id: edge.id, source: edge.source, target: edge.target },
     }));
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const cy = cytoscape({
       container: containerComponentRef.current!,
       elements: [...components, ...nodeElements, ...edgeElements],

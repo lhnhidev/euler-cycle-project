@@ -11,11 +11,13 @@ const WindowTitle = () => {
   const [isMaximized, setIsMaximized] = useState(false);
 
   const handleMinimize = () => {
-    window.electronAPI.send("window-control", "minimize");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).electronAPI.send("window-control", "minimize");
   };
 
   const handleMaximize = () => {
-    window.electronAPI.send(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).electronAPI.send(
       "window-control",
       isMaximized ? "unmaximize" : "maximize",
     );
@@ -23,7 +25,8 @@ const WindowTitle = () => {
   };
 
   const handleClose = () => {
-    window.electronAPI.send("window-control", "close");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).electronAPI.send("window-control", "close");
   };
 
   return (

@@ -69,10 +69,6 @@ const DetailedResult = ({ isHidden }: Props) => {
     },
   ];
 
-  useEffect(() => {
-    console.log(info.circuit.map((node) => node.label).join(" -> "));
-  });
-
   return isHidden ? null : (
     <div
       onClick={() => setIsDetailedResultHidden(true)}

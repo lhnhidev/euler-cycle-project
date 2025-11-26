@@ -1,11 +1,7 @@
 import { useGraphContext } from "@/context/GraphContext";
 import { Input, Slider, Tooltip, type InputNumberProps } from "antd";
 import { useEffect, useRef, useState } from "react";
-import {
-  GiPerspectiveDiceSixFacesRandom,
-  GiSpeaker,
-  GiSpeakerOff,
-} from "react-icons/gi";
+import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 import { ImNext2, ImPrevious2 } from "react-icons/im";
 import { IoIosPause, IoIosPlay } from "react-icons/io";
 import { MdAutoGraph, MdOutlineLoop } from "react-icons/md";
@@ -29,8 +25,6 @@ const ControllBar = () => {
     setHighlightedCell,
   } = useAppContext();
 
-  // const [play, setPlay] = useState<boolean>(false);
-  const [speak, setSpeak] = useState<boolean>(false);
   const [showFormatOption, setShowFormatOption] = useState<boolean>(false);
   const [showDownloadOption, setShowDownloadOption] = useState<boolean>(false);
   const [sliderValue, setSliderValue] = useState<number>(0);
@@ -73,10 +67,10 @@ const ControllBar = () => {
     if (!runner) return;
 
     if (play) {
-      console.log("▶ Bắt đầu chạy");
+      // console.log("▶ Bắt đầu chạy");
       runner.play();
     } else {
-      console.log("⏸ Dừng lại");
+      // console.log("⏸ Dừng lại");
       runner.pause();
     }
   }, [play]);
@@ -178,7 +172,6 @@ const ControllBar = () => {
     if (nodeList && nodeList.length > 0) {
       const foundNode = nodeList.find((node) => node.label === value);
       if (foundNode) {
-        console.log({ id: foundNode.id, label: foundNode.label });
         setNodeStart({ id: foundNode.id, label: foundNode.label });
       }
     }
@@ -294,14 +287,6 @@ const ControllBar = () => {
             </Tooltip>
           </div>
 
-          <div className="hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300">
-            <Tooltip
-              title={speak ? "Tắt âm thanh" : "Bật âm thanh"}
-              placement="top"
-            >
-              {speak ? <GiSpeaker /> : <GiSpeakerOff />}
-            </Tooltip>
-          </div>
           <div className="relative hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300">
             <div className="absolute bottom-[calc(100%+15px)] right-[-30px]">
               <FormatGraphOptions show={showFormatOption} />

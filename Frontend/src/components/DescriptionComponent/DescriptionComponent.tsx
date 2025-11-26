@@ -27,7 +27,7 @@ const DescriptionComponent = () => {
     (_record: ColumnType<TableType>, rowIndex: number | undefined) => {
       // So sánh rowIndex của hàng hiện tại với row trong state
       // So sánh columnIndex (cột hiện tại) với column trong state
-      console.log(highlightedCell.row, highlightedCell.col);
+      // console.log(highlightedCell.row, highlightedCell.col);
       if (
         rowIndex === (highlightedCell.row ?? -999) &&
         columnIndex === (highlightedCell.col ?? -999)

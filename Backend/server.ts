@@ -49,8 +49,6 @@ ${message}`;
 
     const response = result.text;
 
-    console.log(response);
-
     res.json({ reply: response });
   } catch (err) {
     console.log(err);

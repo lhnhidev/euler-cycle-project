@@ -2,8 +2,9 @@
 import { Input, Modal, Tooltip, Button, Empty } from "antd";
 import { VscNewFile, VscNewFolder } from "react-icons/vsc";
 import DirectoryTreeContent from "./DirectoryTreeContent";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAppContext } from "@/context/AppContext";
+import { useGraphContext } from "@/context/GraphContext";
 
 export interface NodeItem {
   id: string;
@@ -30,6 +31,30 @@ declare global {
   }
 }
 
+const filterTree = (nodes: NodeItem[], searchTerm: string): NodeItem[] => {
+  return nodes
+    .map((node) => {
+      const newNode = { ...node };
+
+      if (newNode.children) {
+        newNode.children = filterTree(newNode.children, searchTerm);
+      }
+
+      const matchesSearch = newNode.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const hasMatchingChildren =
+        newNode.children && newNode.children.length > 0;
+
+      if (matchesSearch || hasMatchingChildren) {
+        return newNode;
+      }
+
+      return null;
+    })
+    .filter((node) => node !== null) as NodeItem[];
+};
+
 const DirectoryTree = () => {
   const [projectPath, setProjectPath] = useState<string>(() => {
     return localStorage.getItem("PROJECT_PATH") || "";
@@ -38,7 +63,10 @@ const DirectoryTree = () => {
   const [treeData, setTreeData] = useState<NodeItem[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
   const { modal, messageApi } = useAppContext();
+  const { setIsDirected } = useGraphContext();
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
 
   const [folderModalOpen, setFolderModalOpen] = useState(false);
@@ -71,6 +99,13 @@ const DirectoryTree = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectPath]);
+
+  // 2. Tính toán dữ liệu hiển thị dựa trên từ khóa tìm kiếm
+  // Sử dụng useMemo để tránh tính toán lại không cần thiết khi render
+  const displayTreeData = useMemo(() => {
+    if (!searchTerm.trim()) return treeData;
+    return filterTree(treeData, searchTerm);
+  }, [treeData, searchTerm]);
 
   const handleSelectRootFolder = async () => {
     try {
@@ -118,10 +153,16 @@ const DirectoryTree = () => {
     });
   };
 
+  const { graph } = useGraphContext();
+
   const handleReadFile = async (path: string) => {
     const res = await window.electronAPI.readFile(path);
     if (res.success) {
-      console.log("Nội dung file:", res.data);
+      graph.current.displayByFile(
+        document.querySelector("#cy") as HTMLDivElement,
+        JSON.parse(res.data || "{}"),
+        setIsDirected,
+      );
       messageApi.success("Đã mở file thành công");
     } else {
       messageApi.error(res.error || "Không thể đọc file");
@@ -131,7 +172,13 @@ const DirectoryTree = () => {
   return (
     <div className="flex h-full flex-col border-r border-[var(--border-color)] bg-[var(--bg-color)] px-2 pt-4">
       <div className="flex h-full flex-col">
-        <Input.Search placeholder="Nhập để tìm kiếm..." variant="filled" />
+        {/* 3. Cập nhật Input để bắt sự kiện onChange */}
+        <Input.Search
+          placeholder="Nhập để tìm kiếm file/folder..."
+          variant="filled"
+          allowClear
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
         <div className="mt-4 flex items-center justify-between">
           <div className="pl-1 font-bold text-[var(--primary-color)]">
@@ -181,8 +228,9 @@ const DirectoryTree = () => {
               </Button>
             </div>
           ) : (
+            // 4. Truyền displayTreeData (đã lọc) vào component con
             <DirectoryTreeContent
-              data={treeData}
+              data={displayTreeData}
               loading={loading}
               selectedPath={selectedPath}
               onSelectNode={handleSelectNode}

@@ -295,6 +295,84 @@ export default class Graph {
       .update();
   }
 
+  displayByFile(
+    container: HTMLDivElement,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data: any,
+    setIsDirectedFunc: (isDirected: boolean) => void,
+  ) {
+    if (!container) {
+      console.error("Container không hợp lệ");
+      return;
+    }
+
+    if (!this.cy) {
+      console.error("Cytoscape instance chưa được khởi tạo!");
+      return;
+    }
+
+    this.clear();
+
+    const rawNodes = data.elements?.nodes || [];
+    const rawEdges = data.elements?.edges || [];
+
+    const nodePositions = new Map<string, { x: number; y: number }>();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rawNodes.forEach((node: any) => {
+      const id = node.data.id;
+      const label = node.data.label || id;
+
+      if (node.position) {
+        nodePositions.set(id, node.position);
+      }
+
+      this.addNode(id, label, true);
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    rawEdges.forEach((edge: any) => {
+      const sourceId = edge.data.source;
+      const targetId = edge.data.target;
+      const idEdge = edge.data.id || `${sourceId}-${targetId}`;
+
+      this.addEdge(sourceId, targetId, idEdge);
+    });
+
+    this.cy.batch(() => {
+      this.cy!.elements().remove();
+      const cyNodes = this.nodes.map((n) => ({
+        group: "nodes" as const,
+        data: { id: n.id, label: n.label },
+        position: nodePositions.get(n.id) || undefined,
+      }));
+
+      const cyEdges = this.edges.map((e) => ({
+        group: "edges" as const,
+        data: { id: e.id, source: e.source, target: e.target },
+      }));
+
+      this.cy!.add([...cyNodes, ...cyEdges]);
+
+      const fileStyle = data.style;
+
+      this.cy!.style().clear().fromJson(fileStyle).update();
+    });
+
+    const layout = this.cy.layout({
+      name: "preset",
+      fit: true,
+      padding: 20,
+    });
+
+    layout.run();
+
+    if (data?.style[1]?.style["target-arrow-shape"] !== "none") {
+      this.setIsDirected(true);
+      setIsDirectedFunc(true);
+    }
+  }
+
   display(container: HTMLDivElement, isRandom = false): () => void {
     if (this.cy) {
       this.cy!.dblclick(200);
@@ -360,10 +438,10 @@ export default class Graph {
           selectedIds.forEach((id) => this.removeNode(id));
           // console.log(this.nodes);
           // console.log(this.edges);
-          console.log(
-            "Đã xóa node:",
-            selectedNodes.map((n) => n.id()),
-          );
+          // console.log(
+          //   "Đã xóa node:",
+          //   selectedNodes.map((n) => n.id()),
+          // );
         }
       }
     });
@@ -395,11 +473,11 @@ export default class Graph {
             this.removeEdge(id.sourceId, id.targetId),
           );
           // console.log(this.nodes);
-          console.log(this.getEdges());
-          console.log(
-            "Đã xóa edge:",
-            selectedEdges.map((e) => e.id()),
-          );
+          // console.log(this.getEdges());
+          // console.log(
+          //   "Đã xóa edge:",
+          //   selectedEdges.map((e) => e.id()),
+          // );
         }
       }
     });
@@ -499,7 +577,7 @@ export default class Graph {
       this._keydownHandler = (e: KeyboardEvent) => {
         if (e.ctrlKey && e.key.toLowerCase() === "r") {
           e.preventDefault();
-          console.log("Bật/tắt chế độ đổi label cho node:", node.id());
+          // console.log("Bật/tắt chế độ đổi label cho node:", node.id());
           this.isChangeingLabelMode = true;
 
           // --- thực hiện logic đổi label ở đây ---
@@ -1514,7 +1592,7 @@ export default class Graph {
     // console.log("Hoàn thành xây dựng chu trình Euler.");
     copyPrevNodesAndEdges(detailSteps, ++i, 19);
 
-    console.log(detailSteps);
+    // console.log(detailSteps);
 
     return {
       steps: detailSteps.length,
@@ -1528,7 +1606,7 @@ export default class Graph {
     this.init();
 
     if (!this.hasEulerPath()) {
-      console.log("Đồ thị không có đường đi Euler.");
+      // console.log("Đồ thị không có đường đi Euler.");
       return [];
     }
 

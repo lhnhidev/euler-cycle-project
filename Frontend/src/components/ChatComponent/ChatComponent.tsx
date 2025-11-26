@@ -96,7 +96,6 @@ const ChatComponent = ({ setShowChatbot }: Props) => {
 
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
     try {
-      console.log(graph.current.getNodes().length);
       const response = await fetch(SERVER_URL, {
         method: "POST",
         headers: {
@@ -143,9 +142,6 @@ const ChatComponent = ({ setShowChatbot }: Props) => {
       }
 
       const data = await response.json();
-
-      // Lấy câu trả lời của AI từ API
-      console.log(data.rely);
 
       const botText = data.reply || "Sorry, I had an error.";
 

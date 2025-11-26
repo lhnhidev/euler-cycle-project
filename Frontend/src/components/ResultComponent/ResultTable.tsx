@@ -118,8 +118,6 @@ const ResultTable = ({ isDetailed = false }: Props) => {
           });
         });
 
-        console.log(newDataSource);
-
         setDataSource(newDataSource);
       }, 200);
     }

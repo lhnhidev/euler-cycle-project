@@ -8,7 +8,10 @@ export interface FileSystemApi {
 
 contextBridge.exposeInMainWorld("electronAPI", {
   ping: () => ipcRenderer.invoke("ping"),
-  send: <T>(channel: "window-control", data: T) => {
+  // send: <T>(channel: "window-control", data: T) => {
+  //   ipcRenderer.send(channel, data);
+  // },
+  send: (channel: string, data: any) => {
     ipcRenderer.send(channel, data);
   },
   receive: (channel: string, func: (...args: unknown[]) => void) => {
