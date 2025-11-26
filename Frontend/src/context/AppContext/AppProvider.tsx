@@ -1,6 +1,7 @@
 import type { Message } from "@/components/ChatComponent/ChatComponent";
 import { AppContext } from "./AppContext";
 import { useState, type ReactNode } from "react";
+import { Modal, message } from "antd";
 
 const AppProvider = ({ children }: { children: ReactNode }) => {
   const [ping, setPing] = useState<string>("Hello from app context!");
@@ -38,6 +39,10 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
     },
   ]);
 
+  const [messageApi, contextHolderMess] = message.useMessage();
+
+  const [modal, contextHolder] = Modal.useModal();
+
   return (
     <AppContext.Provider
       value={{
@@ -59,6 +64,10 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
         setHighlightedCell,
         messages,
         setMessages,
+        modal,
+        contextHolder,
+        messageApi,
+        contextHolderMess,
       }}
     >
       {children}

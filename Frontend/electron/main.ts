@@ -1,6 +1,7 @@
 import {
   app,
   BrowserWindow,
+  dialog,
   globalShortcut,
   ipcMain,
   Menu,
@@ -39,7 +40,6 @@ function createWindow() {
     mainWindow.loadURL("http://localhost:5173");
     mainWindow.webContents.openDevTools();
   } else {
-    // Sau khi build Vite sẽ nằm trong dist
     mainWindow.loadFile(path.join(__dirname, "../dist/index.html"));
   }
 
@@ -111,10 +111,8 @@ ipcMain.handle("fs:readDirectory", (event, dirPath: string) => {
   return { success: true, data: [rootNode] as NodeItem[] };
 });
 
-// Xử lý tạo thư mục
 ipcMain.handle("fs:createFolder", async (event, folderPath) => {
   try {
-    // fs.mkdirSync là lệnh đồng bộ, đơn giản cho ví dụ
     fs.mkdirSync(folderPath, { recursive: true });
     return { success: true, path: folderPath };
   } catch (error) {
@@ -124,7 +122,6 @@ ipcMain.handle("fs:createFolder", async (event, folderPath) => {
   }
 });
 
-// Xử lý tạo file
 ipcMain.handle("fs:createFile", async (event, filePath, content = "") => {
   try {
     fs.writeFileSync(filePath, content);
@@ -133,6 +130,48 @@ ipcMain.handle("fs:createFile", async (event, filePath, content = "") => {
     console.error("Lỗi khi tạo file:", error);
     const message = error instanceof Error ? error.message : String(error);
     return { success: false, error: message };
+  }
+});
+
+ipcMain.handle("fs:readFile", async (event, filePath) => {
+  try {
+    if (!fs.existsSync(filePath)) {
+      return { success: false, error: "File không tồn tại" };
+    }
+    const content = fs.readFileSync(filePath, "utf-8");
+    return { success: true, data: content };
+  } catch (error) {
+    console.error("Lỗi khi đọc file:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    return { success: false, error: message };
+  }
+});
+
+ipcMain.handle("fs:deleteItem", async (event, itemPath) => {
+  try {
+    fs.rmSync(itemPath, { recursive: true, force: true });
+    return { success: true };
+  } catch (error) {
+    console.error("Lỗi khi xóa:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    return { success: false, error: message };
+  }
+});
+
+ipcMain.handle("fs:selectFolder", async () => {
+  if (!mainWindow) return { canceled: true };
+
+  const result = await dialog.showOpenDialog(mainWindow, {
+    properties: ["openDirectory"], // Chỉ cho phép chọn thư mục
+    title: "Chọn thư mục dự án",
+    buttonLabel: "Chọn Folder này",
+  });
+
+  if (result.canceled) {
+    return { canceled: true };
+  } else {
+    // Trả về đường dẫn đầu tiên được chọn
+    return { canceled: false, path: result.filePaths[0] };
   }
 });
 

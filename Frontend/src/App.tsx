@@ -13,8 +13,12 @@ import "animate.css";
 import ChatComponent from "./components/ChatComponent";
 
 function App() {
-  const { minimizeDescriptionComponent, isDetailedResultHidden } =
-    useAppContext();
+  const {
+    minimizeDescriptionComponent,
+    isDetailedResultHidden,
+    contextHolder,
+    contextHolderMess,
+  } = useAppContext();
   const [showChatbotLabel, setShowChatbotLabel] = useState(true);
   const [showChatbot, setShowChatbot] = useState(false);
 
@@ -98,6 +102,9 @@ function App() {
           </div>
         )}
       </div>
+
+      {contextHolder}
+      {contextHolderMess}
     </>
   );
 }

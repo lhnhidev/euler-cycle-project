@@ -26,6 +26,12 @@ export interface AppContextType {
   >;
   messages: Message[];
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  modal: any;
+  contextHolder: React.ReactNode;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  messageApi: any;
+  contextHolderMess: React.ReactNode;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
