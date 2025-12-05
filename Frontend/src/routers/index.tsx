@@ -3,6 +3,7 @@ import HomePage from "@/pages/HomePage";
 import RootLayout from "@/layout/RootLayout";
 import InfoPage from "@/pages/InfoPage";
 import DocumentPage from "@/pages/DocumentPage";
+import PracticePage from "@/pages/PracticePage";
 
 const routes: RouteObject[] = [
   {
@@ -21,11 +22,14 @@ const routes: RouteObject[] = [
         path: "document",
         element: <DocumentPage />,
       },
+      {
+        path: "practice",
+        element: <PracticePage />,
+      },
     ],
   },
 ];
 
-// Tạo router instance (Dùng HashRouter cho Electron)
 const router = createHashRouter(routes);
 
 export default router;

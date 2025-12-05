@@ -12,7 +12,6 @@ import TitleComponent from "../TitleComponent";
 import { Select } from "antd";
 import { LANGUAGE_OPTIONS } from "@/const";
 
-// ✅ Chỉ tạo 1 compartment duy nhất
 const highlightCompartment = new Compartment();
 
 const PesudoCode = () => {
@@ -26,7 +25,6 @@ const PesudoCode = () => {
     LANGUAGE_OPTIONS[2].pesudoCode(nodeStart),
   );
 
-  // ✅ Cập nhật nội dung mã giả khi nodeStart hoặc lang thay đổi
   useEffect(() => {
     const english = LANGUAGE_OPTIONS[2].pesudoCode(nodeStart);
     const vn = LANGUAGE_OPTIONS[1].pesudoCode(nodeStart);
@@ -70,9 +68,9 @@ const PesudoCode = () => {
       view.destroy();
       viewRef.current = null;
     };
-  }, []); // chỉ chạy 1 lần
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // ✅ Cập nhật highlight mà không reset editor
   useEffect(() => {
     if (!viewRef.current) return;
     const view = viewRef.current;
@@ -84,7 +82,6 @@ const PesudoCode = () => {
     });
   }, [linesToHighlight]);
 
-  // ✅ Khi đổi ngôn ngữ hoặc nodeStart → cập nhật nội dung
   useEffect(() => {
     if (viewRef.current) {
       viewRef.current.dispatch({

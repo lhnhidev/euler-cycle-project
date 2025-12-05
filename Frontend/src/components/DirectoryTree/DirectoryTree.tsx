@@ -100,8 +100,6 @@ const DirectoryTree = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectPath]);
 
-  // 2. Tính toán dữ liệu hiển thị dựa trên từ khóa tìm kiếm
-  // Sử dụng useMemo để tránh tính toán lại không cần thiết khi render
   const displayTreeData = useMemo(() => {
     if (!searchTerm.trim()) return treeData;
     return filterTree(treeData, searchTerm);
@@ -228,7 +226,6 @@ const DirectoryTree = () => {
               </Button>
             </div>
           ) : (
-            // 4. Truyền displayTreeData (đã lọc) vào component con
             <DirectoryTreeContent
               data={displayTreeData}
               loading={loading}

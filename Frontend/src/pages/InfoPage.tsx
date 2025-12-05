@@ -139,7 +139,7 @@ const InfoPage = () => {
   const displayFacebook = import.meta.env.VITE_FACEBOOK_LINK;
 
   return (
-    <div className="mx-auto ml-[calc(var(--height-title-bar-windows)-5px)] mt-[var(--height-title-bar-windows)] h-full w-full overflow-y-auto px-32 pb-10">
+    <div className="mx-auto ml-[calc(var(--height-title-bar-windows)-5px)] mt-[var(--height-title-bar-windows)] h-full w-[calc(100vw-var(--height-title-bar-windows))+5px] overflow-y-auto px-32 pb-10">
       <div className="mx-auto grid grid-cols-1 md:grid-cols-12">
         {/* --- CỘT TRÁI: THÔNG TIN CÁ NHÂN --- */}
         <div className="col-span-1 md:col-span-4 lg:col-span-4">
@@ -240,7 +240,6 @@ const InfoPage = () => {
           </Card>
         </div>
 
-        {/* --- CỘT PHẢI: GIỚI THIỆU DỰ ÁN --- */}
         <div className="col-span-1 md:col-span-8 lg:col-span-8">
           <Card
             title={

@@ -1,6 +1,7 @@
 import { Tooltip } from "antd";
 import { FaBook, FaHome } from "react-icons/fa";
 import { IoInformationCircle } from "react-icons/io5";
+import { MdAssignment } from "react-icons/md";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const WindowNav = () => {
@@ -42,6 +43,15 @@ const WindowNav = () => {
           onClick={() => navigate("/document")}
         >
           <FaBook />
+        </div>
+      </Tooltip>
+
+      <Tooltip title="Luyện tập" placement="right">
+        <div
+          className={getItemClass("/practice")}
+          onClick={() => navigate("/practice")}
+        >
+          <MdAssignment />
         </div>
       </Tooltip>
     </div>

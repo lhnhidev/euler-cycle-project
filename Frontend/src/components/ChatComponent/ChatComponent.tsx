@@ -33,14 +33,11 @@ const ChatComponent = ({ setShowChatbot }: Props) => {
     hasEulerPath,
   } = useGraphContext();
 
-  // State để lưu danh sách các tin nhắn
   const { messages, setMessages, nodeStart, minimizeDescriptionComponent } =
     useAppContext();
 
-  // State để lưu nội dung tin nhắn đang nhập
   const [newMessage, setNewMessage] = useState<string>("");
 
-  // Ref để tự động cuộn xuống tin nhắn mới nhất
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -87,12 +84,10 @@ const ChatComponent = ({ setShowChatbot }: Props) => {
       timestamp: new Date().toLocaleTimeString(),
     };
 
-    // Cập nhật state với tin nhắn mới và bật loading
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setIsLoading(true);
 
     const messageToSend = newMessage;
-    // Xóa nội dung input
     setNewMessage("");
 
     const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -103,7 +98,7 @@ const ChatComponent = ({ setShowChatbot }: Props) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          message: messageToSend, // Gửi tin nhắn của người dùng
+          message: messageToSend,
           defaultRole: `${
             graph.current.getNodes().length === 0
               ? "Đồ thị hiện tại đang trống, chưa có dữ liệu"
@@ -153,7 +148,6 @@ const ChatComponent = ({ setShowChatbot }: Props) => {
         timestamp: new Date().toLocaleTimeString(),
       };
 
-      // Thêm tin nhắn của bot vào danh sách
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       console.error("Error calling chat API:", error);

@@ -44,13 +44,11 @@ const ControllBar = () => {
   useEffect(() => {
     if (!graph.current || info.detailSteps.length === 0) return;
 
-    // Ngừng runner cũ nếu có
     runnerRef.current?.pause();
 
-    // Tạo runner mới
     runnerRef.current = createRunner(
       graph.current,
-      info, // ✅ Truyền toàn bộ info, không chỉ detailSteps
+      info,
       setLinesToHighlight,
       () => 1500 / speedRef.current,
       setSliderValue,
@@ -67,10 +65,10 @@ const ControllBar = () => {
     if (!runner) return;
 
     if (play) {
-      // console.log("▶ Bắt đầu chạy");
+      // console.log("Bắt đầu chạy");
       runner.play();
     } else {
-      // console.log("⏸ Dừng lại");
+      // console.log("Dừng lại");
       runner.pause();
     }
   }, [play]);
@@ -150,7 +148,7 @@ const ControllBar = () => {
     const nodeList = graph.current?.getNodes();
 
     if (nodeList && nodeList.length > 0) {
-      const randomIndex = Math.floor(Math.random() * (nodeList.length - 1 + 1)); // từ 0 đến nodeList.length - 1
+      const randomIndex = Math.floor(Math.random() * (nodeList.length - 1 + 1));
       setNodeStart(nodeList[randomIndex] || { id: "", label: "" });
     }
   };
@@ -204,12 +202,12 @@ const ControllBar = () => {
           onChange={handleSliderChange}
           style={{ margin: 0, padding: 0, height: "4px" }}
           handleStyle={{
-            opacity: 0, // ẩn nhưng vẫn giữ tooltip
-            pointerEvents: "none", // tránh click trúng handle
+            opacity: 0,
+            pointerEvents: "none",
           }}
           tooltip={{
             // open: true,
-            formatter: (value) => `${value}/${maxSliderValue - 1}`, // định dạng nội dung tooltip
+            formatter: (value) => `${value}/${maxSliderValue - 1}`,
           }}
           trackStyle={{
             backgroundColor: "var(--secondary-color)",

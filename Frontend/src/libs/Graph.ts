@@ -189,8 +189,6 @@ export default class Graph {
   }
 
   addEdge(sourceId: string, targetId: string, idEdge: string): boolean {
-    // Nút nguồn và đích phải tồn tại
-
     if (!this.nodes.find((node) => node.id === sourceId)) {
       console.log(`Nút có id là ${sourceId} không tồn tại.`);
       return false;
@@ -200,7 +198,6 @@ export default class Graph {
       console.log(`Nút có id là ${targetId} không tồn tại.`);
       return false;
     }
-    //
 
     this.edges.push({ source: sourceId, target: targetId, id: idEdge });
     this.notify();

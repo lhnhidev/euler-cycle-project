@@ -36,7 +36,6 @@ function createWindow() {
   Menu.setApplicationMenu(null);
 
   if (process.env.NODE_ENV === "development") {
-    // Vite dev server chạy ở 5173
     mainWindow.loadURL("http://localhost:5173");
     mainWindow.webContents.openDevTools();
   } else {

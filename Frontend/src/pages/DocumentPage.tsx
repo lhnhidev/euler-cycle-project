@@ -2,18 +2,14 @@ import { useEffect, useRef } from "react";
 import cytoscape from "cytoscape";
 import { Typography, Card, Table, Tag, Divider, Alert } from "antd";
 import {
-  BookOutlined,
   BulbOutlined,
   CheckCircleOutlined,
   FileTextOutlined,
 } from "@ant-design/icons";
 import CSSGraph from "@/libs/CSSGraph";
 
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 
-// --- Dữ liệu mẫu cho các đồ thị minh họa ---
-
-// Đồ thị 1: Vô hướng - Có Chu trình Euler (Tất cả các đỉnh bậc chẵn)
 const elementsEulerCircuit = [
   { data: { id: "a", label: "1" } },
   { data: { id: "b", label: "2" } },
@@ -25,12 +21,11 @@ const elementsEulerCircuit = [
   { data: { source: "c", target: "d" } },
   { data: { source: "d", target: "e" } },
   { data: { source: "e", target: "a" } },
-  { data: { source: "b", target: "e" } }, // Thêm cạnh để tăng bậc
+  { data: { source: "b", target: "e" } },
   { data: { source: "b", target: "d" } },
-  { data: { source: "e", target: "d" } }, // Đỉnh d bậc 4, b bậc 4, e bậc 4, a bậc 2, c bậc 2
+  { data: { source: "e", target: "d" } },
 ];
 
-// Đồ thị 2: Vô hướng - Có Đường đi Euler (2 đỉnh bậc lẻ)
 const elementsEulerPath = [
   { data: { id: "1", label: "A" } },
   { data: { id: "2", label: "B" } },
@@ -42,7 +37,6 @@ const elementsEulerPath = [
   { data: { source: "3", target: "4" } },
 ];
 
-// --- Component con để vẽ đồ thị bằng Cytoscape ---
 interface GraphVisualizerProps {
   elements: cytoscape.ElementDefinition[];
   title: string;
@@ -137,7 +131,7 @@ const DocumentPage = () => {
   ];
 
   return (
-    <div className="mx-auto ml-[calc(var(--height-title-bar-windows)-5px)] mt-[var(--height-title-bar-windows)] h-full w-full overflow-y-auto bg-white px-10 pb-10 md:px-20 lg:px-32">
+    <div className="mx-auto ml-[calc(var(--height-title-bar-windows)-5px)] mt-[var(--height-title-bar-windows)] h-full w-[calc(100vw-var(--height-title-bar-windows))+5px] overflow-y-auto bg-white px-10 pb-10 md:px-20 lg:px-32">
       {/* Header */}
       <div className="mb-8 mt-5 border-b pb-4">
         <h2 className="text-2xl font-bold text-[var(--primary-color)]">
