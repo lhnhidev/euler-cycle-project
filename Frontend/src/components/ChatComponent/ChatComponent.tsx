@@ -34,7 +34,8 @@ const ChatComponent = ({ setShowChatbot }: Props) => {
   } = useGraphContext();
 
   // State để lưu danh sách các tin nhắn
-  const { messages, setMessages, nodeStart } = useAppContext();
+  const { messages, setMessages, nodeStart, minimizeDescriptionComponent } =
+    useAppContext();
 
   // State để lưu nội dung tin nhắn đang nhập
   const [newMessage, setNewMessage] = useState<string>("");
@@ -169,7 +170,9 @@ const ChatComponent = ({ setShowChatbot }: Props) => {
   };
 
   return (
-    <div className="mx-auto my-5 flex h-[600px] w-[400px] flex-col overflow-hidden rounded-md border border-gray-300 shadow-lg">
+    <div
+      className={`${minimizeDescriptionComponent ? "hidden" : ""} mx-auto my-5 flex h-[600px] w-[400px] flex-col overflow-hidden rounded-md border border-gray-300 shadow-lg`}
+    >
       <div className="flex justify-center bg-[#367cd1] p-2.5 text-center font-bold text-white">
         <p>U-Lầy Chatbot</p>
       </div>

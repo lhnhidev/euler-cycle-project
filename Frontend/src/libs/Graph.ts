@@ -370,6 +370,9 @@ export default class Graph {
     if (data?.style[1]?.style["target-arrow-shape"] !== "none") {
       this.setIsDirected(true);
       setIsDirectedFunc(true);
+    } else {
+      this.setIsDirected(false);
+      setIsDirectedFunc(false);
     }
   }
 
@@ -1177,39 +1180,167 @@ export default class Graph {
     return true;
   }
 
-  hasEulerPath(): boolean {
+  hasEulerCycle(): { flag: boolean; note: string } {
     this.init();
-    if (this.isEulerGraph()) return true;
+
+    const nodes = this.getNodes();
+    if (nodes.length === 0) {
+      return {
+        flag: false,
+        note: "Đồ thị không có đỉnh nào.",
+      };
+    }
+
+    if (this.getEdges().length === 0) {
+      return {
+        flag: false,
+        note: "Đồ thị không có cạnh nào.",
+      };
+    }
 
     const components = this.countComponents();
-    if (components > 1) return false;
-    if (components === 0) return false;
+
+    if (components > 1) {
+      return {
+        flag: false,
+        note: `Vì đồ thị không ${this.isDirected ? "liên thông mạnh" : "liên thông"} (có ${components} thành phần).`,
+      };
+    }
+
+    if (this.isDirected) {
+      for (const node of nodes) {
+        const inDeg = this.degIn[node.id] || 0;
+        const outDeg = this.degOut[node.id] || 0;
+        if (inDeg !== outDeg) {
+          return {
+            flag: false,
+            note: `Vì đỉnh ${node.label} có bậc vào (${inDeg}) khác bậc ra (${outDeg}).`,
+          };
+        }
+      }
+    } else {
+      const oddDegreeNodes: string[] = [];
+      for (const node of nodes) {
+        const deg = this.degree[node.id] || 0;
+        if (deg % 2 !== 0) {
+          oddDegreeNodes.push(node.label);
+        }
+      }
+      if (oddDegreeNodes.length > 0) {
+        return {
+          flag: false,
+          note: `Vì đồ thị có ${oddDegreeNodes.length} đỉnh bậc lẻ: ${oddDegreeNodes.join(", ")}.`,
+        };
+      }
+    }
+
+    return {
+      flag: true,
+      note: "Đồ thị thỏa mãn mọi điều kiện để có chu trình Euler.",
+    };
+  }
+
+  hasEulerPath(): { flag: boolean; note: string } {
+    this.init();
+
+    if (this.isEulerGraph()) {
+      return {
+        flag: true,
+        note: "Vì đồ thị thỏa mãn mọi điều kiện để có chu trình Euler.",
+      };
+    }
+
+    const components = this.countComponents();
+    if (components > 1) {
+      return {
+        flag: false,
+        note: `Vì đồ thị không liên thông (đang có ${components} thành phần liên thông)`,
+      };
+    }
+    if (components === 0) {
+      return {
+        flag: false,
+        note: "Vì đồ thị rỗng",
+      };
+    }
 
     if (!this.isDirected) {
       let countNodeHaveOddDegree = 0;
+
+      let tmpFlag = true;
+      const oddDegreeNodes: string[] = [];
+
       for (const node of this.getNodes()) {
         const deg = this.degree[node.id] || 0;
-        if (deg % 2 !== 0) ++countNodeHaveOddDegree;
+        if (deg % 2 !== 0) {
+          oddDegreeNodes.push(node.label);
+          countNodeHaveOddDegree++;
+        }
 
-        if (countNodeHaveOddDegree > 2) return false;
+        // Logic cũ: nếu quá 2 đỉnh bậc lẻ thì sai ngay
+        if (countNodeHaveOddDegree > 2) {
+          tmpFlag = false;
+        }
       }
-      return countNodeHaveOddDegree === 2;
+
+      if (!tmpFlag) {
+        return {
+          flag: false,
+          note: `Vì đồ thị vô hướng có nhiều hơn 2 đỉnh bậc lẻ (Điều kiện đường đi Euler là có đúng 2 đỉnh bậc lẻ);
+          Số đỉnh bậc lẻ: ${countNodeHaveOddDegree};
+          Các đỉnh bậc lẻ: ${oddDegreeNodes.join(", ")}`,
+        };
+      }
+
+      // Logic cũ: return countNodeHaveOddDegree === 2;
+      if (countNodeHaveOddDegree === 2) {
+        return {
+          flag: true,
+          note: "Đồ thị thỏa mãn mọi điều kiện",
+        };
+      } else {
+        return {
+          flag: false,
+          note: `Vì đồ thị vô hướng có nhiều hơn 2 đỉnh bậc lẻ (Điều kiện đường đi Euler là có đúng 2 đỉnh bậc lẻ);
+          Số đỉnh bậc lẻ: ${countNodeHaveOddDegree};
+          Các đỉnh bậc lẻ: ${oddDegreeNodes.join(", ")}`,
+        };
+      }
     } else {
-      let startNode = 0;
-      let endNode = 0;
+      let startNode = 0; // Số đỉnh có out - in = 1
+      let endNode = 0; // Số đỉnh có in - out = 1
+
       for (const node of this.getNodes()) {
         const outDeg = this.degOut[node.id] || 0;
         const inDeg = this.degIn[node.id] || 0;
 
-        if (outDeg - inDeg === 1) ++startNode;
-        else if (inDeg - outDeg === 1) ++endNode;
-        else if (inDeg !== outDeg) return false;
+        if (outDeg - inDeg === 1) {
+          ++startNode;
+        } else if (inDeg - outDeg === 1) {
+          ++endNode;
+        } else if (inDeg !== outDeg) {
+          // Logic cũ: return false nếu đỉnh không cân bằng và không phải start/end
+          return {
+            flag: false,
+            note: `Vi phạm tại đỉnh ${node.label}: Bậc vào (${inDeg}) khác bậc ra (${outDeg})`,
+          };
+        }
 
-        if (startNode > 1 || endNode > 1) return false;
+        // Logic cũ: return false nếu có nhiều hơn 1 đỉnh đầu hoặc 1 đỉnh cuối
+        if (startNode > 1 || endNode > 1) {
+          return {
+            flag: false,
+            note: "Vì đồ thị có hướng có nhiều hơn 1 đỉnh bắt đầu hoặc nhiều hơn 1 đỉnh kết thúc.",
+          };
+        }
       }
-    }
 
-    return true;
+      // Nếu chạy hết vòng lặp mà không return false -> Thỏa mãn
+      return {
+        flag: true,
+        note: "Vì đồ thị thỏa mãn mọi điều kiện",
+      };
+    }
   }
 
   private edgeVisited: { [key: string]: boolean } = {};
@@ -1605,7 +1736,7 @@ export default class Graph {
   buildEulerPath(): { id: string; label: string }[] {
     this.init();
 
-    if (!this.hasEulerPath()) {
+    if (!this.hasEulerPath().flag) {
       // console.log("Đồ thị không có đường đi Euler.");
       return [];
     }

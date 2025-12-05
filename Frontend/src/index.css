@@ -136,3 +136,13 @@ body {
 ::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* Nếu là Notification (như trong hình của bạn) */
+.ant-notification {
+  z-index: 99999999999999999 !important;
+}
+
+/* Nếu là Message (thông báo nhỏ chỉ có 1 dòng text) - thêm dự phòng */
+.ant-message {
+  z-index: 99999999999999999 !important;
+}

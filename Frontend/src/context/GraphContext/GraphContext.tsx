@@ -42,10 +42,16 @@ export interface GraphContextType {
   >;
   isEulerian: boolean | null;
   setIsEulerian: React.Dispatch<React.SetStateAction<boolean | null>>;
-  hasEulerPath: boolean | null;
-  setHasEulerPath: React.Dispatch<React.SetStateAction<boolean | null>>;
+  hasEulerPath: { flag: boolean; note: string };
+  setHasEulerPath: React.Dispatch<
+    React.SetStateAction<{ flag: boolean; note: string }>
+  >;
   connectedComponents: number;
   setConnectedComponents: React.Dispatch<React.SetStateAction<number>>;
+  hasEulerCycle: { flag: boolean; note: string };
+  setHasEulerCycle: React.Dispatch<
+    React.SetStateAction<{ flag: boolean; note: string }>
+  >;
 }
 
 export const GraphContext = createContext<GraphContextType | undefined>(

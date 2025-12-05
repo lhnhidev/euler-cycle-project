@@ -35,7 +35,15 @@ const GraphProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const [isEulerian, setIsEulerian] = useState<boolean | null>(null);
-  const [hasEulerPath, setHasEulerPath] = useState<boolean | null>(null);
+  const [hasEulerPath, setHasEulerPath] = useState<{
+    flag: boolean;
+    note: string;
+  }>({ flag: false, note: "" });
+
+  const [hasEulerCycle, setHasEulerCycle] = useState<{
+    flag: boolean;
+    note: string;
+  }>({ flag: false, note: "" });
 
   const graph = useRef(new Graph());
 
@@ -71,6 +79,8 @@ const GraphProvider = ({ children }: { children: ReactNode }) => {
         setHasEulerPath,
         connectedComponents,
         setConnectedComponents,
+        hasEulerCycle,
+        setHasEulerCycle,
       }}
     >
       {children}

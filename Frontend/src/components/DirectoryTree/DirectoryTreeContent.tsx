@@ -99,7 +99,7 @@ const DirectoryTreeContent = ({
                     <span className="truncate">{node.data.name}</span>
                   </div>
 
-                  <div className="invisible flex items-center gap-2 pr-1 group-hover:visible">
+                  <div className="invisible mr-3 flex items-center gap-2 group-hover:visible">
                     {node.isLeaf && (
                       <Tooltip title="Mở file">
                         <div

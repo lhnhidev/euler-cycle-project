@@ -14,6 +14,8 @@ const ResultComponent = () => {
     hasEulerPath,
     setIsEulerian,
     setHasEulerPath,
+    hasEulerCycle,
+    setHasEulerCycle,
   } = useGraphContext();
   const {
     isDetailedResultHidden,
@@ -33,6 +35,7 @@ const ResultComponent = () => {
     setConnectedComponents(graph.current.countComponents());
     setIsEulerian(graph.current.isEulerGraph());
     setHasEulerPath(graph.current.hasEulerPath());
+    setHasEulerCycle(graph.current.hasEulerCycle());
   }, [
     graph,
     render,
@@ -40,8 +43,10 @@ const ResultComponent = () => {
     setIsEulerian,
     setHasEulerPath,
     isEulerian,
-    hasEulerPath,
+    hasEulerPath.flag,
+    hasEulerCycle.flag,
     setConnectedComponents,
+    setHasEulerCycle,
   ]);
 
   // const handleCount = () => {
@@ -115,15 +120,13 @@ const ResultComponent = () => {
                       </p>
                     </li>
 
-                    {hasEulerPath !== null && (
-                      <li>
-                        <p className="set-text-font-size-smaller">
-                          {hasEulerPath
-                            ? "Đồ thị có đường đi Euler"
-                            : "Đồ thị không có đường đi Euler"}
-                        </p>
-                      </li>
-                    )}
+                    <li>
+                      <p className="set-text-font-size-smaller">
+                        {hasEulerPath.flag
+                          ? "Đồ thị có đường đi Euler"
+                          : "Đồ thị không có đường đi Euler"}
+                      </p>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -133,9 +136,15 @@ const ResultComponent = () => {
                   Giải thích:
                 </span>
 
-                <p className="set-text-font-size-smaller ml-3">
-                  Vì nó không có đỉnh bậc chẵn
-                </p>
+                <div className="set-text-font-size-smaller ml-3 mt-1 space-y-1">
+                  <p>{hasEulerCycle.note}</p>
+                </div>
+
+                {/* <p className="set-text-font-size-smaller ml-3">
+                  Đồ thị {hasEulerPath.flag ? "có" : "không có"} đường đi Euler
+                  vì:
+                  {hasEulerPath.note}
+                </p> */}
               </div>
             </div>
           </div>

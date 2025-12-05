@@ -77,25 +77,27 @@ const HomePage = () => {
       </div>
 
       <DetailedResult isHidden={isDetailedResultHidden} />
-      <div className="absolute bottom-[40px] right-[30px] z-[99999999] flex items-center gap-3">
-        {showChatbotLabel && (
-          <span className="animate__bounceIn animate__animated rounded-full bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 opacity-65 shadow-md">
-            Hỏi mình gì đó đi...
-          </span>
-        )}
-        {!showChatbot ? (
-          <div
-            onClick={handleShowChatbot}
-            className="cursor-pointer rounded-full bg-[var(--primary-color)] p-3 text-3xl text-white shadow-lg hover:bg-[var(--secondary-color)]"
-          >
-            <BsRobot />
-          </div>
-        ) : (
-          <div className="">
-            <ChatComponent setShowChatbot={setShowChatbot}></ChatComponent>
-          </div>
-        )}
-      </div>
+      {minimizeDescriptionComponent ? null : (
+        <div className="absolute bottom-[40px] right-[30px] z-[99999999] flex items-center gap-3">
+          {showChatbotLabel && (
+            <span className="animate__bounceIn animate__animated rounded-full bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 opacity-65 shadow-md">
+              Hỏi mình gì đó đi...
+            </span>
+          )}
+          {!showChatbot ? (
+            <div
+              onClick={handleShowChatbot}
+              className="cursor-pointer rounded-full bg-[var(--primary-color)] p-3 text-3xl text-white shadow-lg hover:bg-[var(--secondary-color)]"
+            >
+              <BsRobot />
+            </div>
+          ) : (
+            <div className="">
+              <ChatComponent setShowChatbot={setShowChatbot}></ChatComponent>
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 };

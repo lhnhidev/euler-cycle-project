@@ -98,7 +98,7 @@ const DescriptionComponent = () => {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="relative">
+      <div className="relative bg-red-200">
         <TitleComponent
           title="Mô tả quy trình"
           style={{ paddingLeft: "8px", paddingRight: "8px" }}
@@ -107,7 +107,7 @@ const DescriptionComponent = () => {
           style={{ position: "absolute", top: 0, right: 0, height: "100%" }}
         />
       </div>
-      <div className="my-2 flex-1 overflow-auto bg-[var(--bg-color)]">
+      <div className="my-2 flex-1 overflow-auto bg-white">
         <Table<TableType>
           bordered={true}
           columns={columns}

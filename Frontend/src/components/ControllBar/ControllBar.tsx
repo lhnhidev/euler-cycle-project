@@ -145,6 +145,8 @@ const ControllBar = () => {
   };
 
   const randomNodeStart = () => {
+    if (play) return;
+
     const nodeList = graph.current?.getNodes();
 
     if (nodeList && nodeList.length > 0) {
@@ -167,6 +169,8 @@ const ControllBar = () => {
   };
 
   const handleChange = (value: string) => {
+    if (play) return;
+
     const nodeList = graph.current?.getNodes();
     setNodeStart({ id: "", label: value });
     if (nodeList && nodeList.length > 0) {
@@ -264,6 +268,15 @@ const ControllBar = () => {
               placeholder="Đỉnh bắt đầu"
               size="small"
               className="w-[100px] rounded-sm text-[12px]"
+              style={
+                play
+                  ? {
+                      backgroundColor: "var(--border-color)",
+                      border: "1px solid var(--border-color)",
+                    }
+                  : {}
+              }
+              disabled={play}
               value={nodeStart.label}
               onChange={(e) => handleChange(e.target.value)}
             />
@@ -292,7 +305,10 @@ const ControllBar = () => {
               <FormatGraphOptions show={showFormatOption} />
             </div>
             <div
-              onClick={() => setShowFormatOption(!showFormatOption)}
+              onClick={() => {
+                if (play) return;
+                setShowFormatOption(!showFormatOption);
+              }}
               className={`${play ? "cursor-default text-gray-400" : "hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"} ${showFormatOption ? "text-[var(--secondary-color)]" : ""}`}
             >
               <Tooltip
@@ -318,7 +334,10 @@ const ControllBar = () => {
             </div>
 
             <div
-              onClick={() => setShowDownloadOption(!showDownloadOption)}
+              onClick={() => {
+                if (play) return;
+                setShowDownloadOption(!showDownloadOption);
+              }}
               className={`${play ? "cursor-default text-gray-400" : "hover:cursor-pointer hover:text-[var(--secondary-color)] active:text-gray-300"} ${showDownloadOption ? "text-[var(--secondary-color)]" : ""}`}
             >
               <Tooltip
