@@ -434,13 +434,12 @@ const PracticePage = () => {
                 className="h-full shadow-sm"
                 extra={
                   <Tag color="blue">
-                    Gợi ý: Luôn chọn đỉnh kề có ID nhỏ nhất
+                    Gợi ý: Luôn chọn đỉnh kề có nhãn nhỏ nhất
                   </Tag>
                 }
               >
                 <Text className="mb-4 block">
-                  Điền vào bảng bên dưới quá trình chạy của thuật toán (Stack &
-                  Circuit):
+                  Điền vào bảng bên dưới quá trình chạy thuật toán Hierholzer:
                 </Text>
 
                 <Table
