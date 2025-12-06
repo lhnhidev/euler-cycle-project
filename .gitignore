@@ -5,6 +5,11 @@
 # Bỏ qua các thư mục dependencies (rất có thể bạn cũng đã commit)
 node_modules
 
-# Bỏ qua các tệp build (nếu có)
+# Bỏ qua các thư mục build
 dist
+release
 build
+
+Frontend/dist
+Frontend/release
+Frontend/electron/dist

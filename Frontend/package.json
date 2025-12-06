@@ -3,12 +3,12 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "main": "electron/dist/main.js",
+  "main": "electron/dist/main.cjs",
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:electron\"",
     "dev:vite": "vite",
-    "dev:electron": "tsc -p electron && wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .",
-    "build": "vite build && tsc -p electron",
+    "dev:electron": "tsc -p electron && move /Y electron\\dist\\main.js electron\\dist\\main.cjs && wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .",
+    "build": "vite build && tsc -p electron && move /Y electron\\dist\\main.js electron\\dist\\main.cjs",
     "build:app": "npm run build && electron-builder",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -23,6 +23,7 @@
     "@types/path-browserify": "^1.0.3",
     "animate.css": "^4.1.1",
     "antd": "^5.27.4",
+    "canvas-confetti": "^1.9.4",
     "codemirror": "^6.0.2",
     "cytoscape": "^3.33.1",
     "cytoscape-dblclick": "^0.3.1",
@@ -36,6 +37,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.3",
@@ -65,6 +67,7 @@
       "electron/dist/**/*"
     ],
     "directories": {
+      "output": "release",
       "buildResources": "assets"
     },
     "win": {
