@@ -61,7 +61,7 @@
   },
   "build": {
     "appId": "com.project.demo",
-    "productName": "ProjectApp",
+    "productName": "Euler Cycle App",
     "files": [
       "dist/**/*",
       "electron/dist/**/*"
