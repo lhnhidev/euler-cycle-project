@@ -53,9 +53,9 @@
 ### <a id="graph-interaction"></a> 📊 Graph Interaction & Editing
 
 <p>
-  <img src="./assets/gifs/feature-section-1.gif" alt="Graph display" align="left" width="50%" style="margin-right: 30px; margin-bottom: 15px;" />
+  <img src="./assets/gifs/feature-section-1.gif" alt="Graph display" width="70%" style="margin-right: 30px; margin-bottom: 15px;" />
 
-  <p style="margin-left: 30px;">
+  <p>
     Flexible Graph Input: Support for multiple graph initialization methods, including manual node/edge creation, structured text file uploads (.json), format graph by many color for edges and nodes, and automated random graph generation.
 
   Dynamic Canvas Manipulations: Real-time graph editing capabilities allowing users to update vertex labels, delete specific nodes/edges, and freely relocate components via drag-and-drop.
