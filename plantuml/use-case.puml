@@ -1,0 +1,84 @@
+@startuml
+' Global Layout Optimization
+skinparam packageStyle rectangle
+skinparam nodesep 15
+skinparam ranksep 40
+left to right direction
+
+' Actors Definition
+actor "User" as User
+actor "Modal Gemini" as Gemini
+
+rectangle "Euler Cycle Simulation Software" {
+
+    rectangle "Graph Interaction & Editing" {
+        usecase "Input Graph Data" as UC_Input
+        usecase "Input via TXT File Upload" as UC_Upload
+        usecase "Input via Random Generation" as UC_Random
+        usecase "Edit Vertex Labels" as UC_EditLabel
+        usecase "Delete Nodes/Edges" as UC_Delete
+        usecase "Move Nodes/Edges" as UC_Move
+        
+        ' Vertically direct extend relationships to prevent overlaps
+        UC_Upload .down.> UC_Input : <<extend>>
+        UC_Random .up.> UC_Input : <<extend>>
+    }
+
+    rectangle "Algorithmic Processing & Simulation" {
+        usecase "Verify Eulerian Property" as UC_CheckEuler
+        usecase "Simulate Algorithm" as UC_Simulate
+        usecase "Control Simulation Process" as UC_Control
+        usecase "Display Execution Table" as UC_ShowTable
+        usecase "Display Pseudocode" as UC_ShowPseudo
+        
+        ' Balance include and extend branches
+        UC_Control .right.> UC_Simulate : <<extend>>
+        UC_Simulate .down.> UC_ShowTable : <<include>>
+        UC_Simulate .up.> UC_ShowPseudo : <<include>>
+    }
+
+    rectangle "Data Persistence" {
+        usecase "Save File" as UC_Save
+        usecase "Load File" as UC_Read
+    }
+
+    rectangle "Intelligent Assistance" {
+        usecase "Graph Theory & Software QA" as UC_Chat
+        usecase "Server Dispatches Response" as UC_Response
+        
+        UC_Chat .right.> UC_Response : <<include>>
+    }
+    
+    rectangle "Practice & Evaluation" {
+        usecase "Solve Subjective Exercises" as UC_Exercise
+        usecase "Verify Eulerian Graph Conditions" as UC_ExCheck
+        usecase "Find Eulerian Cycle in Given Graph" as UC_ExFind
+        
+        ' Separate exercise execution branches
+        UC_Exercise .down.> UC_ExCheck : <<include>>
+        UC_Exercise .up.> UC_ExFind : <<include>>
+    }
+}
+
+' --- RE-DESIGNED ACTOR ARROWS TO PREVENT OVERLAPS ---
+
+' Connections to Subsystem 1 (Graph Interaction)
+User --> UC_Input
+User --> UC_EditLabel
+User --> UC_Delete
+User --> UC_Move
+
+' Connections to Subsystem 2 (Algorithmic Processing)
+User ---> UC_CheckEuler
+User ---> UC_Simulate
+
+' Connections to Subsystems 3 & 5 (Data & Practice)
+User ----> UC_Save
+User ----> UC_Read
+User ----> UC_Exercise
+
+' Isolated Chatbot connections at the lower area
+User ----> UC_Chat
+UC_Chat <-- Gemini
+
+@endum
