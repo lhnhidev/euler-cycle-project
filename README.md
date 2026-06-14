@@ -52,8 +52,8 @@
 
 ### <a id="graph-interaction"></a> 📊 Graph Interaction & Editing
 
-<img src="./assets/gifs/feature-section-1.gif" alt="Graph display" align="left" width="50%" style="margin-right: 15px; margin-bottom: 15px;" />
 <p>
+  <img src="./assets/gifs/feature-section-1.gif" alt="Graph display" align="left" width="50%" style="margin-right: 30px; margin-bottom: 15px;" />
 
   Flexible Graph Input: Support for multiple graph initialization methods, including manual node/edge creation, structured text file uploads (.json), format graph by many color for edges and nodes, and automated random graph generation.
 
