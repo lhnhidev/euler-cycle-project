@@ -17,7 +17,7 @@ app.use(cors({
 app.use(express.json());
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-const modelName = "gemini-2.0-flash";
+const modelName = "gemini-2.5-flash-lite";
 
 app.post("/api/chat", async (req, res) => {
   try {
@@ -59,6 +59,7 @@ ${message}`;
     res.json({ reply: response });
   } catch (err) {
     console.log(err);
+    console.log(process.env.GEMINI_API_KEY)
     res.status(500).json({ error: err.message || err });
   }
 });
