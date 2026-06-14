@@ -98,7 +98,6 @@ Graph Serialization: Ability to save custom-designed graphs to local storage and
 
   <br />
   <br />
-  <br />
 
   * **Grade:** Received a perfect score of **10/10** for the Fundamental Software Engineering Project course.
   * **Evaluated by:** Department of Software Engineering, Can Thu University.
