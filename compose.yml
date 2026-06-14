@@ -27,7 +27,7 @@ services:
       - VITE_START_URL=http://localhost:3001/api/start
       - VITE_FACEBOOK_LINK=https://www.facebook.com/le.hoang.nhi.404070
       - VITE_EMAIL=lhnhi420@gmail.com
-      - VITE_API_GITHUB_PROFILE=https://github.com/lhnhidev
+      - VITE_API_GITHUB_PROFILE=https://api.github.com/users/lhnhidev
     volumes:
       - ./Frontend:/app
       - /app/node_modules
