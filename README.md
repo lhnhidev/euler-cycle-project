@@ -62,8 +62,6 @@
   <p />
 </p>
 
-<br />
-
 <p>
 
   ### <a id="algorithimic">🧠 Algorithmic Processing & Simulation</a> 
