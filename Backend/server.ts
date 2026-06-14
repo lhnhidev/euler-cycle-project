@@ -6,7 +6,14 @@ const { GoogleGenAI } = require("@google/genai");
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://euler-cycle-project.vercel.app',
+    'http://localhost:5173'
+  ],
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
 app.use(express.json());
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
