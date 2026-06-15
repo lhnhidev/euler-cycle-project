@@ -11,6 +11,10 @@
 </p>
 
 <p align="center">
+  <b>Buid With</b>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB" alt="React" />
   <img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
@@ -26,7 +30,9 @@
 
 ---
 
-## 📜 Table of Contents
+## ➡️ [Demo Here](https://euler-cycle-project.vercel.app/)
+
+## 📌 Table of Contents
 * [💫 About ECV](#about)
 * [✨ Features](#feature)
   * [📊 Graph Interaction & Editing](#graph-interaction)
@@ -35,13 +41,19 @@
   * [💾 Data Persistence](#data)
   * [🤖 Intelligent Assistance](#ai)
 * [🏆 Achievement](#achievement)
-* [3. How It Works?](#3-how-it-works)
+* [🗺️ Usecase Diagram](#usecase)
+* [📦 Installation & Setup](#setup)
+* [💡 Usage Guide](#usage)
+* [🤝 Contributing](#contributing)
+* [✍️ Author](#author)
+* [📜 License](#license)
+* [💖 Feedback & Support](#feedback)
 
 ## <a id="about"></a>💫 About ECV
 <p>
   <img src="./assets/imgs/Bridges_of_Konigsberg.png" alt="Seven Bridges of Königsberg" align="right" width="320" style="margin-left: 15px; margin-bottom: 15px;" />
   
-  <strong>Euler Cycle Virtualisation (ECV)</strong> is an interactive platform designed to transform the abstract concepts of graph theory into dynamic visual experiences. The project focuses on step-by-step simulations of the Euler Cycle algorithm — a classic problem originating from the historic "[Seven Bridges of Königsberg](https://en.wikipedia.org/wiki/Seven_Bridges_of_K%C3%B6nigsberg)" puzzle. By automating the validation and traversal processes, ECV effectively bridges the gap between complex mathematical theorems and practical computer science education.
+  <strong>Euler Cycle Virtualisation (ECV)</strong> is an interactive platform designed to transform the abstract concepts of graph theory into dynamic visual experiences. The project focuses on step-by-step simulations of the Euler Cycle algorithm — a classic problem originating from the historic "[Seven Bridges of Königsberg](https://en.wikipedia.org/wiki/Seven_Bridges_of_K%C3%B6nigsberg)" puzzle. By automating the validation and traversal processes, ECV effectively bridges the gap between complex mathematical theorems and practical computer science education. This project is developed for two platforms: web and desktop.
 </p>
 
 <p>
@@ -101,107 +113,146 @@ Graph Serialization: Ability to save custom-designed graphs to local storage and
   * **Evaluated by:** Department of Software Engineering, Can Thu University.
 </p>
 
-## <a id="usecase"></a> 🗺️ Usecase diagram
+## <a id="usecase"></a> 🗺️ Usecase Diagram
 <p align="center">
 <img src="./assets/imgs/use-case-v2.png" alt="use-case-diagram" />
 <p/>
 
-## ⚙️ Installation / Hướng dẫn cài đặt
+## <a id="setup"></a> 📦 Installation & Setup
 
-### 1. Clone the repository / Tải dự án
+Follow these instructions to get a copy of the project up and running on your local machine for development and testing purposes. You can choose to run the application natively or via Docker.
 
-Open your terminal and run the following commands:
-Mở terminal và chạy các lệnh sau:
+### <a id="prer"></a> 📋 Prerequisites
+Before you begin, ensure you have the following installed:
+* [Git](https://git-scm.com/)
+* [Node.js](https://nodejs.org/) (v18.0.0 or higher recommended) & (npm/bun)
+* [Docker](https://www.docker.com/) (Optional - for containerized setup)
 
+### 📥 Clone the Repository
 ```bash
-git init
-git clone <url-repo>
-cd euler-cycle-project
+git clone git@github.com:lhnhidev/euler-cycle-virtualisation-ecv.git
 ```
 
-### 2. Install Dependencies / Cài đặt thư viện
+### 💻 Method A: Native Local Setup (Web & Desktop)
 
-You need to install dependencies for both Frontend and Backend folders. Bạn cần cài đặt thư viện cho cả hai thư mục Frontend và Backend.
-
-**Frontend:**
-
-```bash
-cd Frontend
-npm i
-```
-
-**Backend:** (Open a new terminal or navigate back / Mở terminal mới hoặc quay lại thư mục gốc)
-
-```bash
-cd ../Backend
-npm i
-```
-
-## 🔑 Configuration / Cấu hình môi trường (.env)
-
-You need to create a **.env** file in both **Frontend** and **Backend** folders. Bạn cần tạo file **.env** tại cả hai thư mục **Frontend** và **Backend**.
-
-**Frontend (Frontend/.env)**
-Copy and paste the following content: Sao chép và dán nội dung sau:
-
+**1. 📝 Frontend Configuration (Frontend/.env)**
+Create a `.env` file in the `Frontend` directory with the following content:
 ```bash
 VITE_SERVER_URL=http://localhost:3001/api/chat
 VITE_START_URL=http://localhost:3001/api/start
-VITE_FACEBOOK_LINK=<your_facebokk>
-VITE_EMAIL=<your_email>
-VITE_API_GITHUB_PROFILE=<your_link_github>
+
+# You can skip below codes line
+VITE_FACEBOOK_LINK=<your_facebook_profile_url>
+VITE_EMAIL=<your_email_address>
+VITE_API_GITHUB_PROFILE=<your_github_profile_url>
 ```
 
-**Backend (Backend/.env)**
-Copy and paste the following content: Sao chép và dán nội dung sau:
-
+**2. Backend Configuration (Backend/.env)**
+Create a `.env` file in the `Backend` directory with the following content:
 ```bash
-GEMINI_API_KEY=<your_api_key>
+# You can obtain an API key from the Google AI Studio website: https://aistudio.google.com
+GEMINI_API_KEY=<your_actual_gemini_api_key>
 ```
 
-> **How to get `GEMINI_API_KEY`:**
->
-> 1. Visit [Google AI Studio](https://aistudio.google.com/).
-> 2. Create a new API Key.
-> 3. Paste it into the `GEMINI_API_KEY` field above.
->
-> **Cách lấy `GEMINI_API_KEY`:**
->
-> 1. Truy cập [Google AI Studio](https://aistudio.google.com/).
-> 2. Tạo một API Key mới.
-> 3. Dán nó vào dòng `GEMINI_API_KEY` ở trên.
+You can use `bun` rather than `npm` to run the project.
 
-## 🚀 Running the Project / Chạy dự án
-
-### 1. Start Backend
-
-Open the terminal in the **Backend** folder and run:
-Mở terminal tại thư mục **Backend** và chạy:
-
+**3. Install dependencies for both the frontend and backend**
 ```bash
+# Install dependencies for Frontend
+cd ./Frontend
+bun install
+
+# Install dependencies for Backend
+cd ../Backend
+bun install
+```
+
+**4. Start the development servers:**
+``` bash
+# Start for Frontend
+# Via the local URL provided in your terminal http://localhost:5173
+cd ../Frontend
+bun run dev
+
+# Start for Backend
+# The API gateway will securely spin up at http://localhost:3001
+cd ../Backend
 node ./server.ts
 ```
 
-### 2. Start Frontend
+### 💻 Method B: Quick Start with Docker
 
-Open the terminal in the **Frontend** folder and run:
-Mở terminal tại thư mục **Frontend** và chạy:
+If you prefer a seamless, isolated environment without messing with local node modules, you can spin up the entire multi-container stack (Frontend, Backend, and Database if any) using Docker Compose.
 
+**1. Build and start the containers in detached mode:**
 ```bash
-npm run dev
+docker-compose up -d --build
 ```
 
-## 🎉 Result / Kết quả
+**2. Verify running containers:**
+```bash
+docker ps
+```
+
+**3. Access the Application:**
+Open your browser and navigate to http://localhost:3000 (or your configured Docker port) to experience the interactive platform.
+
+**4. Stop the environment:**
+To stop and remove the containers, simply run:
+```bash
+docker-compose down
+```
+
+### 🎉 Result
 
 If configured successfully, after about 1-3 minutes, you will see an interface like this:
-Nếu cấu hình thành công, sau khoảng 1-3 phút bạn sẽ thấy giao diện như thế này hiện ra:
 
 ![interface of software](https://res.cloudinary.com/dpsj6nk7y/image/upload/v1765297091/image_bjvyre.png)
 
-## 💡 Usage Guide / Hướng dẫn sử dụng
+## <a id="usage"></a> 💡 Usage Guide
 
-**[English]**
-Simply ask the Chatbot inside the software about Euler cycles or how to use the graph. Note: If you don't have an API Key... well, it's not a big deal. You can just figure out how to use it yourself =))
+For a deep dive into the mathematical proofs of the Hierholzer algorithm, edge cases (e.g., disconnected graphs, isolated vertices), and advanced configuration options, please refer to my [Document](https://drive.google.com/file/d/1jEPfSPySuHFDRd9Vt9EDrMQyBg9pn2Ea/view?usp=sharing).
 
-**[Tiếng Việt]**
-Đơn giản là hãy hỏi con Chatbot được tích hợp trong phần mềm để biết cách dùng. Lưu ý: Nếu bạn không có API Key thì không sao cả, bạn có thể tự mò cách dùng =))
+## <a id="contributing"></a> 🤝 Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
+
+1. Fork the Project
+2. Create your Feature Branch (git checkout -b feature/amazing-feature)
+3. Commit your Changes using Conventional Commits format
+```bash
+git commit -m '<type>(<scope>): <description>'
+```
+4. Push to the Branch (git push origin feature/amazing-feature)
+5. Open a Pull Request
+
+## <a id="author"></a> ✍️ Author
+
+<img src="https://avatars.githubusercontent.com/u/137694596?s=96&v=4" width="60px" align="left" />
+
+Le Hoang Nhi - Initial work & Lead Developer - @lhnhidev
+
+You can also connect with me via [LinkedIn](https://www.linkedin.com/in/nhi-l%C3%AA-021188324/) or lhnhi420@gmail.com
+
+## <a id="license"></a>  📜 License
+Distributed under the MIT License. See LICENSE file in the repository for more information.
+
+## <a id="feedback"></a> 💖 Feedback & Support
+
+If you love using ECV, please consider giving me a star on GitHub! ⭐
+
+- Found a bug? Open an Issue on my repository.
+
+- Have a feature request? I would love to hear it! Start a Discussion or drop an issue.
+
+- Want to contribute? I welcome PRs!
+
+---
+
+<div align="center">
+  <img src="https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NnpvOWloaXJ5NmhrZDl6eGw2ZnZ2bmpra2g5dzk1eDFla3p0bDZrbSZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/4CY4bfRdpRUIFQLh66/giphy.gif" height="250" />
+</div>
+
+<p align="center">✨ Your feedback and stars help keep this project growing ✨</p>
