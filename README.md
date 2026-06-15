@@ -237,7 +237,7 @@ Le Hoang Nhi - Initial work & Lead Developer - @lhnhidev
 You can also connect with me via [LinkedIn](https://www.linkedin.com/in/nhi-l%C3%AA-021188324/) or lhnhi420@gmail.com
 
 ## <a id="license"></a>  📜 License
-Distributed under the MIT License. See LICENSE file in the repository for more information.
+Distributed under the MIT License. See [LICENSE](./LICENSE) file in the repository for more information.
 
 ## <a id="feedback"></a> 💖 Feedback & Support
 
